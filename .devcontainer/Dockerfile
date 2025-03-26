@@ -9,6 +9,7 @@ RUN groupmod -g $GID -n $USER node \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
         bash-completion \
+        git-flow \
         sudo \
         vim \
     && rm -rf /var/lib/apt/lists/* \
