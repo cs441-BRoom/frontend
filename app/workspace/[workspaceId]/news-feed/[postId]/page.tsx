@@ -102,16 +102,19 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
                 </div>
               </div>
 
-              <p className='mb-3 text-lg text-gray-700'>
-                {post.content}
-              </p>
+              <p className='mb-3 text-lg text-gray-700'>{post.content}</p>
               {post.images.length > 0 && (
-                  <div className="grid grid-cols-3 gap-2 my-3">
-                    {post.images.map((image, index) => (
-                      <img key={index} src={image} alt={`Post Image ${index}`} className="w-full h-40 object-cover rounded-lg" />
-                    ))}
-                  </div>
-                )}
+                <div className='my-3 grid grid-cols-3 gap-2'>
+                  {post.images.map((image, index) => (
+                    <img
+                      key={index}
+                      src={image}
+                      alt={`Post Image ${index}`}
+                      className='h-40 w-full rounded-lg object-cover'
+                    />
+                  ))}
+                </div>
+              )}
 
               <hr className='my-2' />
               <div className='mt-3 flex items-center justify-between text-sm text-gray-500'>
@@ -124,11 +127,10 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
                 <div>
                   <span>{post.commentsCount}</span>
                 </div>
-                  
               </div>
             </div>
           </div>
-  
+
           <hr className='my-3' />
           <div className='flex flex-col'>
             {comments.map((comment, index) => (
