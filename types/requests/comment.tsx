@@ -1,8 +1,8 @@
-export interface StoreRequest {
+export interface CommentStoreRequest {
   news_id: number;
-  content: 'string';
+  content: string;
 }
 
-export interface UpdateRequest {
-  content: 'string';
+export interface CommentUpdateRequest {
+  content: string;
 }
