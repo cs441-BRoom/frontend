@@ -1,10 +1,10 @@
-export interface StoreRequest {
+export interface NewsStoreRequest {
   workspace_id: number;
   title: string;
   content: string;
 }
 
-export interface UpdateRequest {
+export interface NewsUpdateRequest {
   title: string;
   content: string;
 }

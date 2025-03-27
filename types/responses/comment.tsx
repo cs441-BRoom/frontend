@@ -1,4 +1,4 @@
-export interface StoreResponse {
+export interface CommentStoreResponse {
   message: string;
 
   comment: {
@@ -11,7 +11,7 @@ export interface StoreResponse {
   };
 }
 
-export interface UpdateResponse {
+export interface CommentUpdateResponse {
   message: string;
 
   comment: {
@@ -24,6 +24,6 @@ export interface UpdateResponse {
   };
 }
 
-export interface destroyReponse {
+export interface CommentDestroyReponse {
   message: string;
 }

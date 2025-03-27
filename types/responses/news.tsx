@@ -24,7 +24,7 @@ export interface IndexResponse {
   ];
 }
 
-export interface StoreResponse {
+export interface NewsStoreResponse {
   message: string;
 
   news: {
@@ -48,10 +48,10 @@ export interface StoreResponse {
   };
 }
 
-export interface UpdateResponse {
+export interface NewsUpdateResponse {
   message: string;
 }
 
-export interface DeleteResponse {
+export interface NewsDeleteResponse {
   message: string;
 }

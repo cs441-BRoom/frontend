@@ -1,4 +1,4 @@
-export interface UpdateResponse {
+export interface UserUpdateResponse {
   user_id: number;
 
   username: string;
@@ -12,10 +12,10 @@ export interface UpdateResponse {
   auth_type: string;
 }
 
-export interface UploadResponse {
+export interface UserUploadResponse {
   message: string;
 }
 
-export interface DeleteResponse {
+export interface UserDeleteResponse {
   message: string;
 }

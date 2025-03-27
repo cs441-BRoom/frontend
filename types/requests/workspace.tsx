@@ -1,4 +1,4 @@
-export interface StoreRequest {
+export interface WorkspaceStoreRequest {
   name: string;
   description: string;
 }
