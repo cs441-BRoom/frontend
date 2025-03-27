@@ -3,25 +3,25 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '@/app/component/navbar';
 import WorkspaceSideBar from '@/app/component/workspace-side-bar';
 import GradientButton from '@/app/component/gradeint-button';
-import PostComponent from '@/app/component/post';
+import NewsComponent from '@/app/component/news';
 import { useRouter } from 'next/navigation';
 import Modal from '@/app/component/modal';
 import { Image, XIcon } from 'lucide-react';
 
 interface NewsfeedPageProps {
-  params: Promise<{ workspaceId: string }>;
+  params: Promise<{ id: number }>;
 }
 
 export default function NewsfeedPage({ params }: NewsfeedPageProps) {
-  const [workspaceId, setWorkspaceId] = useState<string | null>(null);
+  const [workspaceId, setWorkspaceId] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [content, setContent] = useState('');
   const [files, setFiles] = useState<File[]>([]);
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
-  const [posts, setPosts] = useState([
+  const [newses, setNewses] = useState([
     {
-      id: 'abc123',
+      id: 1,
       username: 'JohnDoe',
       date: 'Mar 27, 2025',
       content: 'This is a post about workspace collaboration.',
@@ -30,7 +30,7 @@ export default function NewsfeedPage({ params }: NewsfeedPageProps) {
       liked: true,
     },
     {
-      id: 'abc456',
+      id: 2,
       username: 'JaneSmith',
       date: 'Mar 26, 2025',
       content: 'Here is another post about team productivity.',
@@ -39,7 +39,7 @@ export default function NewsfeedPage({ params }: NewsfeedPageProps) {
       liked: false,
     },
     {
-      id: '789',
+      id: 3,
       username: 'AliceJohnson',
       date: 'Mar 25, 2025',
       content: 'Excited about the new workspace features!',
@@ -48,7 +48,7 @@ export default function NewsfeedPage({ params }: NewsfeedPageProps) {
       liked: false,
     },
     {
-      id: 'abc11112',
+      id: 4,
       username: 'BobMartin',
       date: 'Mar 24, 2025',
       content:
@@ -59,16 +59,16 @@ export default function NewsfeedPage({ params }: NewsfeedPageProps) {
     },
   ]);
 
-  const handleLikeClick = (postId: string) => {
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === postId
+  const handleLikeClick = (newsId: number) => {
+    setNewses((prevPosts) =>
+      prevPosts.map((news) =>
+        news.id === newsId
           ? {
-              ...post,
-              liked: !post.liked,
-              likes: post.liked ? post.likes - 1 : post.likes + 1,
+              ...news,
+              liked: !news.liked,
+              likes: news.liked ? news.likes - 1 : news.likes + 1,
             }
-          : post
+          : news
       )
     );
   };
@@ -78,7 +78,7 @@ export default function NewsfeedPage({ params }: NewsfeedPageProps) {
   useEffect(() => {
     const fetchData = async () => {
       const resolvedParams = await params;
-      setWorkspaceId(resolvedParams.workspaceId);
+      setWorkspaceId(resolvedParams.id);
       console.log('workspace ' + workspaceId);
     };
 
@@ -89,9 +89,9 @@ export default function NewsfeedPage({ params }: NewsfeedPageProps) {
     return <div>Loading...</div>;
   }
 
-  const handlePostClick = (postId: string) => {
-    router.push(`/workspace/${workspaceId}/news-feed/${postId}`);
-    console.log(postId);
+  const handlePostClick = (newsId: number) => {
+    router.push(`/workspace/${workspaceId}/news-feed/${newsId}`);
+    console.log(newsId);
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,7 +135,7 @@ export default function NewsfeedPage({ params }: NewsfeedPageProps) {
 
   return (
     <div className='flex h-screen'>
-      <WorkspaceSideBar workspaceId={workspaceId} />
+      <WorkspaceSideBar id={workspaceId} />
       <div className='flex-1 bg-gray-50'>
         <Navbar />
         <div className='p-6'>
@@ -149,16 +149,16 @@ export default function NewsfeedPage({ params }: NewsfeedPageProps) {
           <div className='flex flex-col'>
             <hr className='my-4' />
             <div className='flex flex-col gap-6'>
-              {posts.map((post, index) => (
-                <PostComponent
+              {newses.map((news, index) => (
+                <NewsComponent
                   key={index}
-                  id={post.id}
-                  username={post.username}
-                  date={post.date}
-                  content={post.content}
-                  likes={post.likes}
-                  comments={post.comments}
-                  liked={post.liked}
+                  id={news.id}
+                  username={news.username}
+                  date={news.date}
+                  content={news.content}
+                  likes={news.likes}
+                  comments={news.comments}
+                  liked={news.liked}
                   onClick={handlePostClick}
                   onLikeClick={handleLikeClick}
                 />

@@ -3,12 +3,12 @@ import React from 'react';
 import { Users } from 'lucide-react';
 
 interface WorkspaceCardProps {
-  id: string;
+  id: number;
   title: string;
   date: string;
   description: string;
-  numberOfPeople: int;
-  onClick: (title: string) => void;
+  numberOfPeople: string;
+  onClick: (id: number) => void;
 }
 
 export default function WorkspaceCard({

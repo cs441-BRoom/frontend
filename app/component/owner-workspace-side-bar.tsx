@@ -31,7 +31,7 @@ export default function OwnerWorkspaceSideBar({
   return (
     <div className='h-full w-64 border-r bg-white px-4 py-6'>
       <Link
-        href='/home'
+        href='/workspace'
         className='flex cursor-pointer items-center gap-2 p-3 text-gray-800'
       >
         <MoveLeft size={20} />

@@ -35,7 +35,7 @@ export default function LoginPage() {
       localStorage.setItem('token', response.data.token);
 
       
-      router.push('/home');
+      router.push('/workspace');
     } catch (err: any) {
       
       setError(err.response?.data?.message || 'Login failed.');

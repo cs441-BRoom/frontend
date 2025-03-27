@@ -6,28 +6,28 @@ import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
 
 interface WorkspaceSideBarProps {
-  workspaceId?: string;
+  id?: number;
 }
 
-export default function WorkspaceSideBar({ workspaceId }: WorkspaceSideBarProps) {
+export default function WorkspaceSideBar({ id }: WorkspaceSideBarProps) {
   const pathname = usePathname();
 
   const menuItems = [
     {
       icon: LayoutGrid,
       label: 'Newsfeed',
-      href: `/workspace/${workspaceId}/news-feed`,
+      href: `/workspace/${id}/news-feed`,
     },
     {
       icon: BookText,
       label: 'Task',
-      href: `/workspace/${workspaceId}/task`,
+      href: `/workspace/${id}/task`,
     },
   ];
   return (
     <div className='h-full w-64 border-r bg-white px-4 py-6'>
       <Link
-        href='/home'
+        href='/workspace'
         className='flex cursor-pointer items-center gap-2 p-3 text-gray-800'
       >
         <MoveLeft size={20} />
@@ -36,7 +36,7 @@ export default function WorkspaceSideBar({ workspaceId }: WorkspaceSideBarProps)
 
       <hr />
       <h2 className='mt-5 mb-3 text-xl font-semibold text-gray-800'>
-        {workspaceId}
+        {id}
       </h2>
       <hr />
       <nav>

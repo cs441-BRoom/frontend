@@ -85,7 +85,7 @@ export default function TaskPage({ params }: TaskPageProps) {
   ];
   return (
     <div className='flex h-screen'>
-      <WorkspaceSideBar workspaceId={workspaceId} />
+      <WorkspaceSideBar id={workspaceId} />
       <div className='flex-1 bg-gray-50'>
         <Navbar />
         <div className='p-6'>

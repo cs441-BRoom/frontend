@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '@/app/component/navbar';
 import WorkspaceSideBar from '@/app/component/workspace-side-bar';
 import GradientButton from '@/app/component/gradeint-button';
-import PostComponent from '@/app/component/post';
+import NewsComponent from '@/app/component/news';
 import { FileText, Heart, Image, X } from 'lucide-react';
 import CommentCard from '@/app/component/comment-card';
 import TextField from '@/app/component/text-field';
@@ -311,7 +311,7 @@ export default function AssignmentsubmissionDetailPage({
   } else if (status === 'past_due') {
     return (
       <div className='flex h-screen'>
-        <WorkspaceSideBar workspaceId={workspaceId} />
+        <WorkspaceSideBar id={workspaceId} />
         <div className='flex-1 bg-gray-50'>
           <Navbar username='John Doe' />
           <div className='p-6'>
@@ -420,7 +420,7 @@ export default function AssignmentsubmissionDetailPage({
   } else if (status === 'pending') {
     return (
       <div className='flex h-screen'>
-        <WorkspaceSideBar workspaceId={workspaceId} />
+        <WorkspaceSideBar id={workspaceId} />
         <div className='flex-1 bg-gray-50'>
           <Navbar username='John Doe' />
           <div className='p-6'>

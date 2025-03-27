@@ -1,20 +1,20 @@
 'use client';
-import { Heart, HeartOff } from 'lucide-react';
+import { Heart} from 'lucide-react';
 import React from 'react';
 
-interface PostProps {
-  id: string;
+interface NewsProps {
+  id: number;
   username: string;
   date: string;
   content: string;
   likes: number;
   comments: number;
   liked: boolean;
-  onClick: (postId: string) => void;
-  onLikeClick: (postId: string) => void;
+  onClick: (newsId: number) => void;
+  onLikeClick: (newsId: number) => void;
 }
 
-export default function PostComponent({
+export default function NewsComponent({
   id,
   username,
   date,
@@ -24,7 +24,7 @@ export default function PostComponent({
   liked,
   onClick,
   onLikeClick,
-}: PostProps) {
+}: NewsProps) {
   return (
     <div
       className='mx-auto w-[50%] rounded-lg bg-white p-4 shadow-md'

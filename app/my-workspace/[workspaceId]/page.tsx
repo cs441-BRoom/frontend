@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '@/app/component/navbar';
 import WorkspaceSideBar from '@/app/component/workspace-side-bar';
 import GradientButton from '@/app/component/gradeint-button';
-import PostComponent from '@/app/component/post';
+import NewsComponent from '@/app/component/news';
 import { useRouter } from 'next/navigation';
 import Modal from '@/app/component/modal';
 import { Image, X, XIcon } from 'lucide-react';
@@ -123,7 +123,7 @@ export default function NewsfeedPage({ params }: NewsfeedPageProps) {
 
   return (
     <div className='flex h-screen'>
-      <WorkspaceSideBar workspaceId={workspaceId} />
+      <WorkspaceSideBar id={workspaceId} />
       <div className='flex-1 bg-gray-50'>
         <Navbar />
         <div className='p-6'>
@@ -138,7 +138,7 @@ export default function NewsfeedPage({ params }: NewsfeedPageProps) {
             <hr className='my-4' />
             <div className='flex flex-col gap-6'>
               {posts.map((post, index) => (
-                <PostComponent
+                <NewsComponent
                   key={index}
                   id={post.id}
                   username={post.username}

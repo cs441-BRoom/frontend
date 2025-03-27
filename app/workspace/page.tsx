@@ -13,7 +13,7 @@ import axiosInstance from '@/apis/axios';
 export default function JoinedWorkspace() {
   const router = useRouter();
   const [isModalJoinOpen, setIsModalJoinOpen] = useState(false);
-  const [selectedWorkspace, setSelectedWorkspace] = useState<string | null>(null);
+  const [selectedWorkspace, setSelectedWorkspace] = useState<number | null>(null);
   const [inviteCode, setInviteCode] = useState('');
   const [workspaces, setWorkspaces] = useState<GetJoinedWorkspacesResponse['workspaces'] | undefined>(undefined);
   const [loading, setLoading] = useState(true);
@@ -66,9 +66,9 @@ export default function JoinedWorkspace() {
     setIsModalJoinOpen(false);
   };
 
-  const handleWorkspaceClick = (title: string) => {
-    setSelectedWorkspace(title);
-    router.push(`/workspace/${title}/news-feed`);
+  const handleWorkspaceClick = (id: number) => {
+    setSelectedWorkspace(id);
+    router.push(`/workspace/${id}/news-feed`);
   };
 
   const fetchWorkspaces = async () => {
