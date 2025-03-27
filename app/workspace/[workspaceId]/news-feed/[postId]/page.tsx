@@ -139,14 +139,14 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
                   <span>{post.likes}</span>
                 </div>
                 <div>
-                  <span>{post.commentsCount}</span>
+                  <span>{post.commentsCount} Comments</span>
                 </div>
               </div>
             </div>
           </div>
 
           <hr className='my-3' />
-          <div className='flex flex-col'>
+          <div className='max-h-[400px] min-h-[400px] overflow-y-auto border border-gray-300 p-3'>
             {comments.map((comment, index) => (
               <CommentCard
                 key={index}
@@ -157,14 +157,14 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
               />
             ))}
           </div>
-          <div className='flex flex-row gap-1.5'>
-            <TextField placeholder='Comment' onChange={handleNewComment} />
-            <GradientButton
-              text='send'
-              width='w-40'
-              onClick={handleAddComment}
-            />
-          </div>
+        </div>
+        <div className='flex flex-row gap-1.5'>
+          <TextField
+            placeholder='Comment'
+            value={newComment}
+            onChange={handleNewComment}
+          />
+          <GradientButton text='send' width='w-40' onClick={handleAddComment} />
         </div>
       </div>
     </div>

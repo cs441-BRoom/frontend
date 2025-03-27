@@ -99,7 +99,7 @@ export default function MyWorkspacePostDetailPage({
     <div className='flex h-screen'>
       <OwnerWorkspaceSideBar workspaceId={workspaceId} invite_code='123' />
       <div className='flex-1 bg-gray-50'>
-        <Navbar username='John Doe' />
+        <Navbar />
         <div className='p-6'>
           <div className='flex-column flex'>
             <div className='w-full justify-end'>
@@ -142,14 +142,14 @@ export default function MyWorkspacePostDetailPage({
                   <span>{post.likes}</span>
                 </div>
                 <div>
-                  <span>{post.commentsCount}</span>
+                  <span>{post.commentsCount} Comments </span>
                 </div>
               </div>
             </div>
           </div>
 
           <hr className='my-3' />
-          <div className='flex flex-col'>
+          <div className='max-h-[400px] min-h-[400px] overflow-y-auto border border-gray-300 p-3'>
             {comments.map((comment, index) => (
               <CommentCard
                 key={index}
@@ -160,14 +160,14 @@ export default function MyWorkspacePostDetailPage({
               />
             ))}
           </div>
-          <div className='flex flex-row gap-1.5'>
-            <TextField placeholder='Comment' onChange={handleNewComment} />
-            <GradientButton
-              text='send'
-              width='w-40'
-              onClick={handleAddComment}
-            />
-          </div>
+        </div>
+        <div className='flex flex-row gap-1.5'>
+          <TextField
+            placeholder='Comment'
+            value={newComment}
+            onChange={handleNewComment}
+          />
+          <GradientButton text='send' width='w-40' onClick={handleAddComment} />
         </div>
       </div>
     </div>
