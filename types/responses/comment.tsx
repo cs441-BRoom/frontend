@@ -23,3 +23,7 @@ export interface UpdateResponse {
     updated_at: string;
   };
 }
+
+export interface destroyReponse {
+  message: string;
+}
