@@ -7,7 +7,6 @@ import WorkspaceCard from '../component/workspace-card';
 import { useRouter } from 'next/navigation';
 import GradientButton from '../component/gradeint-button';
 import Modal from '../component/modal';
-import { X } from 'lucide-react';
 import TextField from '../component/text-field';
 
 export default function HomePage() {
@@ -36,7 +35,6 @@ export default function HomePage() {
   };
 
   function closeModal() {
-    setIsModalOpen(false);
     setIsModalJoinOpen(false);
   }
 
