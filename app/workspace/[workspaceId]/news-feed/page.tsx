@@ -7,7 +7,7 @@ import PostComponent from '@/app/component/post';
 import { useRouter } from 'next/navigation';
 import { Modak } from 'next/font/google';
 import Modal from '@/app/component/modal';
-import { Image, X } from 'lucide-react';
+import { Image, X, XIcon } from 'lucide-react';
 
 interface WorkspaceDetailPageProps {
   params: Promise<{ workspaceId: string }>;
@@ -191,7 +191,7 @@ export default function NewsfeedPage({ params }: WorkspaceDetailPageProps) {
                   onClick={() => removeImage(index)}
                   className='absolute top-1 right-1 rounded-full p-1 text-xs text-white'
                 >
-                  ❌
+                  <XIcon />
                 </button>
               </div>
             ))}
