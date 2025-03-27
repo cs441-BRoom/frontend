@@ -2,90 +2,81 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '@/app/component/navbar';
 import WorkspaceSideBar from '@/app/component/workspace-side-bar';
-
+import { FileText, Image } from 'lucide-react';
+import { isAfter, parseISO } from 'date-fns';
+import OwnerWorkspaceSideBar from '@/app/component/owner-workspace-side-bar';
+import GradientButton from '@/app/component/gradeint-button';
+import AssignmentSubmissionCard from '@/app/component/assignment-submission-card';
 import { useRouter } from 'next/navigation';
 
-import AssignmentCard from '@/app/component/assignment-card';
-
-interface TaskPageProps {
-  params: Promise<{ workspaceId: string }>;
+interface MyTaskDetailPageProps {
+  params: Promise<{ workspaceId: string; taskId: string }>;
 }
 
-export default function TaskPage({ params }: TaskPageProps) {
+export default function MyTaskDetailPage({ params }: MyTaskDetailPageProps) {
+  const [taskId, setTaskId] = useState<string | null>(null);
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
-  const [tasktId, setTaskId] = useState('');
+  const [userId, setUserId] = useState<string | null>(null);
+  const [submissionId, setsubmissionId] = useState<string | null>(null);
 
   const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
       const resolvedParams = await params;
+      setTaskId(resolvedParams.taskId);
       setWorkspaceId(resolvedParams.workspaceId);
-      console.log('workspace ' + workspaceId);
     };
 
     fetchData();
   }, [params]);
 
-  if (!workspaceId) {
-    return <div>Loading...</div>;
-  }
-
   const handleTaskClick = (tasktId: string) => {
     setTaskId(tasktId);
-    router.push(`/workspace/${workspaceId}/task/${tasktId}`);
+    router.push(
+      `/my-workspace/${workspaceId}/my-task/${tasktId}/${submissionId}`
+    );
     console.log(tasktId);
   };
 
   const assignments = [
     {
       id: '1',
-      title: 'Math Homework',
       dueDate: '2025-04-01T12:00:00Z',
-      description: 'Complete exercises 1 to 10 from chapter 5.',
-      owner: 'Mr. Smith',
-      assignmentId: 'A001',
+      username: 'JohnDoe',
       workspaceId: 'W001',
       submissionDate: '2025-03-30T10:00:00Z',
-      score: '90',
+      assignmentId: 'A001',
     },
     {
       id: '2',
-      title: 'Science Project',
       dueDate: '2025-04-05T18:00:00Z',
-      description: 'Build a model of the solar system.',
-      owner: 'Mrs. Johnson',
-      assignmentId: 'A002',
+      username: 'JaneSmith',
       workspaceId: 'W002',
-      submissionDate: null,
-      score: null,
+      submissionDate: null, // ยังไม่ได้ส่ง
+      assignmentId: 'A002',
     },
     {
       id: '3',
-      title: 'English Essay',
       dueDate: '2025-04-03T15:00:00Z',
-      description: 'Write a 1000-word essay on Shakespeare.',
-      owner: 'Mr. Brown',
-      assignmentId: 'A003',
+      username: 'AliceBrown',
       workspaceId: 'W003',
       submissionDate: '2025-04-02T20:00:00Z',
-      score: '85',
+      assignmentId: 'A003',
     },
     {
       id: '4',
-      title: 'History Presentation',
       dueDate: '2025-04-07T09:00:00Z',
-      description: 'Prepare a slideshow about World War II.',
-      owner: 'Ms. Wilson',
-      assignmentId: 'A004',
+      username: 'BobWilson',
       workspaceId: 'W004',
-      submissionDate: null,
-      score: null,
+      submissionDate: null, // ยังไม่ได้ส่ง
+      assignmentId: 'A004',
     },
   ];
+
   return (
     <div className='flex h-screen'>
-      <WorkspaceSideBar workspaceId={workspaceId} />
+      <OwnerWorkspaceSideBar workspaceId={workspaceId} invite_code='abc123' />
       <div className='flex-1 bg-gray-50'>
         <Navbar />
         <div className='p-6'>
@@ -94,13 +85,11 @@ export default function TaskPage({ params }: TaskPageProps) {
             <hr className='my-4' />
             <div className='flex w-full flex-col items-center justify-center gap-6'>
               {assignments.map((assignment, index) => (
-                <AssignmentCard
+                <AssignmentSubmissionCard
                   key={index}
                   id={assignment.id}
-                  title={assignment.title}
+                  username={assignment.username}
                   dueDate={assignment.dueDate}
-                  description={assignment.description}
-                  owner={assignment.owner}
                   workspaceId={assignment.workspaceId}
                   submissionDate={assignment.submissionDate}
                   onClick={handleTaskClick}

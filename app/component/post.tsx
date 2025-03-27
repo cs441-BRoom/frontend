@@ -1,5 +1,5 @@
 'use client';
-import { Heart } from 'lucide-react';
+import { Heart, HeartOff } from 'lucide-react';
 import React from 'react';
 
 interface PostProps {
@@ -9,7 +9,9 @@ interface PostProps {
   content: string;
   likes: number;
   comments: number;
+  liked: boolean;
   onClick: (postId: string) => void;
+  onLikeClick: (postId: string) => void;
 }
 
 export default function PostComponent({
@@ -19,7 +21,9 @@ export default function PostComponent({
   content,
   likes,
   comments,
+  liked,
   onClick,
+  onLikeClick,
 }: PostProps) {
   return (
     <div
@@ -40,9 +44,22 @@ export default function PostComponent({
       <div className='mt-3 flex items-center justify-between text-sm text-gray-500'>
         <div className='flex items-center'>
           <span className='mr-2'>
-            <Heart />
+            <span className='mr-2'>
+              <div className='flex flex-row gap-2'>
+                <div
+                  className='cursor-pointer'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onLikeClick(id);
+                  }}
+                >
+                  {liked && <Heart className='text-sm text-red-600' />}
+                  {!liked && <Heart />}
+                </div>
+                <span className='mt-1'>{likes}</span>
+              </div>
+            </span>
           </span>
-          <span>{likes}</span>
         </div>
         <div>
           <span>{comments} Comments</span>

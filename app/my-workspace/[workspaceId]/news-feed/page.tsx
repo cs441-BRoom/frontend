@@ -6,7 +6,8 @@ import GradientButton from '@/app/component/gradeint-button';
 import PostComponent from '@/app/component/post';
 import { useRouter } from 'next/navigation';
 import Modal from '@/app/component/modal';
-import { Image, XIcon } from 'lucide-react';
+import { Image, X, XIcon } from 'lucide-react';
+import OwnerWorkspaceSideBar from '@/app/component/owner-workspace-side-bar';
 
 interface NewsfeedPageProps {
   params: Promise<{ workspaceId: string }>;
@@ -95,7 +96,7 @@ export default function NewsfeedPage({ params }: NewsfeedPageProps) {
 
   const handlePostClick = (postId: string) => {
     setPostId(postId);
-    router.push(`/workspace/${workspaceId}/news-feed/${postId}`);
+    router.push(`/my-workspace/${workspaceId}/news-feed/${postId}`);
     console.log(postId);
   };
 
@@ -140,7 +141,7 @@ export default function NewsfeedPage({ params }: NewsfeedPageProps) {
 
   return (
     <div className='flex h-screen'>
-      <WorkspaceSideBar workspaceId={workspaceId} />
+      <OwnerWorkspaceSideBar workspaceId={workspaceId} invite_code='1234' />
       <div className='flex-1 bg-gray-50'>
         <Navbar />
         <div className='p-6'>

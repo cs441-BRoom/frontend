@@ -10,12 +10,15 @@ import Modal from '../component/modal';
 import { X } from 'lucide-react';
 import TextField from '../component/text-field';
 
-export default function HomePage() {
+export default function MyWorkspacePage() {
   const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalJoinOpen, setIsModalJoinOpen] = useState(false);
   const [selectedWorkspace, setSelectedWorkspace] = useState<string | null>(
     null
   );
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [inviteCode, setInviteCode] = useState('');
 
   const formatDate = (timestamp: number) => {
@@ -27,10 +30,24 @@ export default function HomePage() {
     });
   };
 
+  const handleCreateWorkspace = async () => {
+    console.log(description + ' ' + title);
+    closeModal();
+  };
+
   const handleJoinWorkspace = async () => {
     console.log(inviteCode);
     closeModal();
   };
+
+  const handleTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTitle(event.target.value);
+  };
+
+  const handleDescription = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setDescription(event.target.value);
+  };
+
   const handleInviteCode = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInviteCode(event.target.value);
   };
@@ -44,7 +61,7 @@ export default function HomePage() {
 
   const handleWorkspaceClick = (title: string) => {
     setSelectedWorkspace(title);
-    router.push(`/workspace/${title}/news-feed`);
+    router.push(`/my-workspace/${title}/news-feed`);
     console.log(selectedWorkspace);
   };
 
@@ -88,14 +105,6 @@ export default function HomePage() {
         'A dedicated workspace to organize tasks and communicate with your team.',
       numberOfPeople: 15,
     },
-    {
-      id: 'eee',
-      title: 'Workspace 5',
-      date: 'Apr 22, 2025',
-      description:
-        'A dedicated workspace to organize tasks and communicate with your team.',
-      numberOfPeople: 15,
-    },
   ];
   return (
     <div className='flex h-screen'>
@@ -105,9 +114,9 @@ export default function HomePage() {
         <Navbar />
         <div className='m-4 flex flex-row justify-end gap-4'>
           <GradientButton
-            text='Join workspace'
+            text='New workspace'
             width='w-40'
-            onClick={() => setIsModalJoinOpen(true)}
+            onClick={() => setIsModalOpen(true)}
           />
         </div>
         <hr className='my-4' />
@@ -128,22 +137,22 @@ export default function HomePage() {
         </div>
       </div>
 
-      <Modal isOpen={isModalJoinOpen} onClose={closeModal}>
+      <Modal isOpen={isModalOpen} onClose={closeModal}>
         <div className='flex w-full items-center justify-between text-gray-800'>
           <h2 className='flex-grow text-center text-2xl text-gray-800'>
-            Join workspace
+            Create workspace
           </h2>
         </div>
         <div className='flex h-full w-full flex-col gap-4'>
           <hr className='my-4' />
+          <TextField placeholder='Title' onChange={handleTitle}></TextField>
           <TextField
-            placeholder='Invite code'
-            onChange={handleInviteCode}
+            placeholder='Description'
+            onChange={handleDescription}
           ></TextField>
-
           <GradientButton
-            text='Join'
-            onClick={handleJoinWorkspace}
+            text='Done'
+            onClick={handleCreateWorkspace}
           ></GradientButton>
         </div>
       </Modal>

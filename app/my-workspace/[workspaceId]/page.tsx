@@ -6,7 +6,7 @@ import GradientButton from '@/app/component/gradeint-button';
 import PostComponent from '@/app/component/post';
 import { useRouter } from 'next/navigation';
 import Modal from '@/app/component/modal';
-import { Image, XIcon } from 'lucide-react';
+import { Image, X, XIcon } from 'lucide-react';
 
 interface NewsfeedPageProps {
   params: Promise<{ workspaceId: string }>;
@@ -20,59 +20,6 @@ export default function NewsfeedPage({ params }: NewsfeedPageProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
-  const [posts, setPosts] = useState([
-    {
-      id: 'abc123',
-      username: 'JohnDoe',
-      date: 'Mar 27, 2025',
-      content: 'This is a post about workspace collaboration.',
-      likes: 120,
-      comments: 45,
-      liked: true,
-    },
-    {
-      id: 'abc456',
-      username: 'JaneSmith',
-      date: 'Mar 26, 2025',
-      content: 'Here is another post about team productivity.',
-      likes: 95,
-      comments: 32,
-      liked: false,
-    },
-    {
-      id: '789',
-      username: 'AliceJohnson',
-      date: 'Mar 25, 2025',
-      content: 'Excited about the new workspace features!',
-      likes: 150,
-      comments: 67,
-      liked: false,
-    },
-    {
-      id: 'abc11112',
-      username: 'BobMartin',
-      date: 'Mar 24, 2025',
-      content:
-        'Just finished a big project with the team. Great work, everyone!',
-      likes: 80,
-      comments: 12,
-      liked: false,
-    },
-  ]);
-
-  const handleLikeClick = (postId: string) => {
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === postId
-          ? {
-              ...post,
-              liked: !post.liked,
-              likes: post.liked ? post.likes - 1 : post.likes + 1,
-            }
-          : post
-      )
-    );
-  };
 
   const router = useRouter();
 
@@ -138,6 +85,42 @@ export default function NewsfeedPage({ params }: NewsfeedPageProps) {
     }
   };
 
+  const posts = [
+    {
+      id: 'abc123',
+      username: 'JohnDoe',
+      date: 'Mar 27, 2025',
+      content: 'This is a post about workspace collaboration.',
+      likes: 120,
+      comments: 45,
+    },
+    {
+      id: 'abc456',
+      username: 'JaneSmith',
+      date: 'Mar 26, 2025',
+      content: 'Here is another post about team productivity.',
+      likes: 95,
+      comments: 32,
+    },
+    {
+      id: '789',
+      username: 'AliceJohnson',
+      date: 'Mar 25, 2025',
+      content: 'Excited about the new workspace features!',
+      likes: 150,
+      comments: 67,
+    },
+    {
+      id: 'abc11112',
+      username: 'BobMartin',
+      date: 'Mar 24, 2025',
+      content:
+        'Just finished a big project with the team. Great work, everyone!',
+      likes: 80,
+      comments: 12,
+    },
+  ];
+
   return (
     <div className='flex h-screen'>
       <WorkspaceSideBar workspaceId={workspaceId} />
@@ -163,9 +146,7 @@ export default function NewsfeedPage({ params }: NewsfeedPageProps) {
                   content={post.content}
                   likes={post.likes}
                   comments={post.comments}
-                  liked={post.liked}
                   onClick={handlePostClick}
-                  onLikeClick={handleLikeClick}
                 />
               ))}
             </div>
