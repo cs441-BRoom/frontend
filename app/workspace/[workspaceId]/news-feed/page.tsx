@@ -14,7 +14,6 @@ interface NewsfeedPageProps {
 
 export default function NewsfeedPage({ params }: NewsfeedPageProps) {
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
-  const [postId, setPostId] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [content, setContent] = useState('');
   const [files, setFiles] = useState<File[]>([]);
@@ -89,12 +88,8 @@ export default function NewsfeedPage({ params }: NewsfeedPageProps) {
   if (!workspaceId) {
     return <div>Loading...</div>;
   }
-  //   if (!postId) {
-  //     return <div>Loading...</div>;
-  //   }
 
   const handlePostClick = (postId: string) => {
-    setPostId(postId);
     router.push(`/workspace/${workspaceId}/news-feed/${postId}`);
     console.log(postId);
   };
