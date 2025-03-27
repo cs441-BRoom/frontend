@@ -15,6 +15,7 @@ export default function RegisterPage() {
     lastname: '',
     email: '',
     password: '',
+    auth_type: 'local',
     password_confirmation: '',
   });
 
@@ -33,6 +34,8 @@ export default function RegisterPage() {
     setLoading(true);
     setError('');
 
+    console.log(formData);
+
     try {
       const response = await axiosInstance.post<RegisterResponse>(
         '/auth/register',
@@ -41,6 +44,7 @@ export default function RegisterPage() {
       console.log(response.data.message);
       router.push('/auth/login');
     } catch (err: any) {
+      console.log(err.response?.data || 'Failed to register.');
       setError(err.response?.data?.message || 'Failed to register.');
     } finally {
       setLoading(false);
@@ -70,21 +74,25 @@ export default function RegisterPage() {
         {/* ✅ ใช้ handleChange และ name attribute เพื่อลดโค้ดซ้ำซ้อน */}
         <TextField
           name="firstname"
+          value={formData.firstname}
           placeholder="First name"
           onChange={handleChange}
         />
         <TextField
           name="lastname"
+          value={formData.lastname}
           placeholder="Last name"
           onChange={handleChange}
         />
         <TextField
           name="username"
+          value={formData.username}
           placeholder="Username"
           onChange={handleChange}
         />
         <TextField
           name="email"
+          value={formData.email}
           type="email"
           placeholder="Email"
           onChange={handleChange}
@@ -92,11 +100,13 @@ export default function RegisterPage() {
         <PasswordTextField
           name="password"
           placeholder="Password"
+          value={formData.password}  // แก้ไขเป็น formData.password
           onChange={handleChange}
         />
         <PasswordTextField
           name="password_confirmation"
           placeholder="Confirm Password"
+          value={formData.password_confirmation}  // แก้ไขเป็น formData.password_confirmation
           onChange={handleChange}
         />
 

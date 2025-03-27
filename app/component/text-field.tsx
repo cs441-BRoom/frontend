@@ -13,12 +13,14 @@ export default function TextField({
   height = 'h-11',
   width = 'w-full',
   type = 'text',
+  name,
   value,
   placeholder,
 }: TextFieldProps) {
   return (
     <div className={`border-2 border-[#259696] ${width} ${height} rounded-lg`}>
       <input
+        name={name}
         type={type}
         value={value}
         placeholder={placeholder}
