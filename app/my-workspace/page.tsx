@@ -10,7 +10,7 @@ import Modal from '../component/modal';
 import TextField from '../component/text-field';
 import { GetMyWorkspacesResponse, StoreRespond } from '@/types/responses/workspace';
 import axiosInstance from '@/apis/axios';
-import { StoreRequest } from '@/types/requests/workspace'; // เพิ่ม import type ของ GetMyWorkspacesResponse
+import { WorkspaceStoreRequest } from '@/types/requests/workspace';
 
 export default function MyWorkspacePage() {
   const router = useRouter();
@@ -76,7 +76,7 @@ export default function MyWorkspacePage() {
       return;
     }
 
-    const requestData: StoreRequest = {
+    const requestData: WorkspaceStoreRequest = {
       name: title,
       description: description,
     };

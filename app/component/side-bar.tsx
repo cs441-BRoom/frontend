@@ -11,7 +11,7 @@ export default function SidebarCustom() {
     {
       icon: LayoutGrid,
       label: 'Workspace',
-      href: '/home',
+      href: '/workspace',
     },
     {
       icon: LayoutGrid,

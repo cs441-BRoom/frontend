@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import LoginPage from './auth/login/page';
 import { useRouter } from 'next/navigation';
-import HomePage from '@/app/home/page';
+import JoinedWorkspace from '@/app/workspace/page';
 
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -23,5 +23,5 @@ export default function Home() {
     return <LoginPage />;
   }
 
-  return <HomePage/>;
+  return <JoinedWorkspace/>;
 }
