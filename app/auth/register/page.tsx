@@ -10,6 +10,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastname] = useState('');
+  const [confirmPassword, setComfirmPassword] = useState('');
 
   const router = useRouter();
 
@@ -34,6 +35,12 @@ export default function RegisterPage() {
     setLastname(event.target.value);
   };
 
+  const handleConfirmPassword = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setComfirmPassword(event.target.value);
+  };
+
   return (
     <div className='flex h-64 min-h-screen w-full items-center justify-center bg-gradient-to-r from-[#2596be] via-[#1c9e56] to-[#1c9e56]'>
       <div className='flex h-[72%] w-full max-w-md flex-col gap-6 rounded-xl bg-white p-8 shadow-lg'>
@@ -48,6 +55,10 @@ export default function RegisterPage() {
         <TextField placeholder='Last name' onChange={handleLastName} />
         <TextField placeholder='Username' onChange={handleUsername} />
         <PasswordTextField placeholder='Password' onChange={handlePassword} />
+        <PasswordTextField
+          placeholder='Confirm Password'
+          onChange={handleConfirmPassword}
+        />
         <GradientButton text='Register' onClick={handleRegister} />
         <a
           href='/auth/login'

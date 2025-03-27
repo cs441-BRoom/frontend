@@ -1,30 +1,30 @@
 export interface RegisterResponse {
-  message: 'string';
+  message: string;
 
   user: {
     user_id: number;
-    username: 'string';
-    firstname: 'string';
-    lastname: 'string';
-    email: 'string';
-    auth_type: 'string';
+    username: string;
+    firstname: string;
+    lastname: string;
+    email: string;
+    auth_type: string;
   };
 }
 
 export interface LoginResponse {
-  message: 'string';
+  message: string;
   user: {
     user_id: number;
-    username: 'string';
-    firstname: 'string';
-    lastname: 'string';
-    email: 'string';
-    auth_type: 'string';
+    username: string;
+    firstname: string;
+    lastname: string;
+    email: string;
+    auth_type: string;
   };
 
-  token: 'string';
+  token: string;
 }
 
 export interface LogoutResponse {
-  message: 'string';
+  message: string;
 }
