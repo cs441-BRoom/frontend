@@ -16,12 +16,7 @@ export default function SidebarCustom() {
     {
       icon: LayoutGrid,
       label: 'My Workspace',
-      href: '/main/team',
-    },
-    {
-      icon: BookText,
-      label: 'My task',
-      href: '/main/calendar',
+      href: '/my-workspace',
     },
   ];
   return (

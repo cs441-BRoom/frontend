@@ -6,12 +6,15 @@ import GradientButton from '@/app/component/gradeint-button';
 import { Heart } from 'lucide-react';
 import CommentCard from '@/app/component/comment-card';
 import TextField from '@/app/component/text-field';
+import OwnerWorkspaceSideBar from '@/app/component/owner-workspace-side-bar';
 
-interface PostDetailPageProps {
+interface MyworkspacePostDetailPageProps {
   params: Promise<{ workspaceId: string; postId: string }>;
 }
 
-export default function PostDetailPage({ params }: PostDetailPageProps) {
+export default function MyWorkspacePostDetailPage({
+  params,
+}: MyworkspacePostDetailPageProps) {
   const [postId, setPostId] = useState<string | null>(null);
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
   const [newComment, setNewComment] = useState<string>('');
@@ -94,9 +97,9 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
 
   return (
     <div className='flex h-screen'>
-      <WorkspaceSideBar workspaceId={workspaceId} />
+      <OwnerWorkspaceSideBar workspaceId={workspaceId} invite_code='123' />
       <div className='flex-1 bg-gray-50'>
-        <Navbar />
+        <Navbar username='John Doe' />
         <div className='p-6'>
           <div className='flex-column flex'>
             <div className='w-full justify-end'>

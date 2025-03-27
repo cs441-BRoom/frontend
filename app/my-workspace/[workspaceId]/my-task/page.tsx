@@ -1,78 +1,28 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Navbar from '@/app/component/navbar';
-import WorkspaceSideBar from '@/app/component/workspace-side-bar';
 import GradientButton from '@/app/component/gradeint-button';
-import PostComponent from '@/app/component/post';
-import { useRouter } from 'next/navigation';
-import Modal from '@/app/component/modal';
-import { Image, XIcon } from 'lucide-react';
 
-interface NewsfeedPageProps {
+import { useRouter } from 'next/navigation';
+
+import MyAssignmentCard from '@/app/component/my-assignment-card';
+import OwnerWorkspaceSideBar from '@/app/component/owner-workspace-side-bar';
+import { Image, XIcon } from 'lucide-react';
+import Modal from '@/app/component/modal';
+
+interface MyTaskPageProps {
   params: Promise<{ workspaceId: string }>;
 }
 
-export default function NewsfeedPage({ params }: NewsfeedPageProps) {
+export default function MyTaskPage({ params }: MyTaskPageProps) {
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
-  const [postId, setPostId] = useState('');
+  const [tasktId, setTaskId] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [content, setContent] = useState('');
   const [files, setFiles] = useState<File[]>([]);
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
-  const [posts, setPosts] = useState([
-    {
-      id: 'abc123',
-      username: 'JohnDoe',
-      date: 'Mar 27, 2025',
-      content: 'This is a post about workspace collaboration.',
-      likes: 120,
-      comments: 45,
-      liked: true,
-    },
-    {
-      id: 'abc456',
-      username: 'JaneSmith',
-      date: 'Mar 26, 2025',
-      content: 'Here is another post about team productivity.',
-      likes: 95,
-      comments: 32,
-      liked: false,
-    },
-    {
-      id: '789',
-      username: 'AliceJohnson',
-      date: 'Mar 25, 2025',
-      content: 'Excited about the new workspace features!',
-      likes: 150,
-      comments: 67,
-      liked: false,
-    },
-    {
-      id: 'abc11112',
-      username: 'BobMartin',
-      date: 'Mar 24, 2025',
-      content:
-        'Just finished a big project with the team. Great work, everyone!',
-      likes: 80,
-      comments: 12,
-      liked: false,
-    },
-  ]);
-
-  const handleLikeClick = (postId: string) => {
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === postId
-          ? {
-              ...post,
-              liked: !post.liked,
-              likes: post.liked ? post.likes - 1 : post.likes + 1,
-            }
-          : post
-      )
-    );
-  };
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
 
   const router = useRouter();
 
@@ -89,15 +39,6 @@ export default function NewsfeedPage({ params }: NewsfeedPageProps) {
   if (!workspaceId) {
     return <div>Loading...</div>;
   }
-  //   if (!postId) {
-  //     return <div>Loading...</div>;
-  //   }
-
-  const handlePostClick = (postId: string) => {
-    setPostId(postId);
-    router.push(`/workspace/${workspaceId}/news-feed/${postId}`);
-    console.log(postId);
-  };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -138,34 +79,86 @@ export default function NewsfeedPage({ params }: NewsfeedPageProps) {
     }
   };
 
+  const handleTaskClick = (tasktId: string) => {
+    setTaskId(tasktId);
+    router.push(`/my-workspace/${workspaceId}/my-task/${tasktId}`);
+    console.log(tasktId);
+  };
+
+  const assignments = [
+    {
+      id: '1',
+      title: 'Math Homework',
+      dueDate: '2025-04-01T12:00:00Z',
+      description: 'Complete exercises 1 to 10 from chapter 5.',
+      owner: 'Mr. Smith',
+      assignmentId: 'A001',
+      workspaceId: 'W001',
+      submissionDate: '2025-03-30T10:00:00Z',
+      score: '90',
+    },
+    {
+      id: '2',
+      title: 'Science Project',
+      dueDate: '2025-04-05T18:00:00Z',
+      description: 'Build a model of the solar system.',
+      owner: 'Mrs. Johnson',
+      assignmentId: 'A002',
+      workspaceId: 'W002',
+      submissionDate: null,
+      score: null,
+    },
+    {
+      id: '3',
+      title: 'English Essay',
+      dueDate: '2025-04-03T15:00:00Z',
+      description: 'Write a 1000-word essay on Shakespeare.',
+      owner: 'Mr. Brown',
+      assignmentId: 'A003',
+      workspaceId: 'W003',
+      submissionDate: '2025-04-02T20:00:00Z',
+      score: '85',
+    },
+    {
+      id: '4',
+      title: 'History Presentation',
+      dueDate: '2025-04-07T09:00:00Z',
+      description: 'Prepare a slideshow about World War II.',
+      owner: 'Ms. Wilson',
+      assignmentId: 'A004',
+      workspaceId: 'W004',
+      submissionDate: null,
+      score: null,
+    },
+  ];
   return (
     <div className='flex h-screen'>
-      <WorkspaceSideBar workspaceId={workspaceId} />
+      <OwnerWorkspaceSideBar workspaceId={workspaceId} invite_code='abc123' />
       <div className='flex-1 bg-gray-50'>
         <Navbar />
         <div className='p-6'>
           <div className='flex flex-row justify-end'>
             <GradientButton
-              text='Post'
+              text='New task'
               width='w-40'
               onClick={() => setIsModalOpen(true)}
             />
           </div>
-          <div className='flex flex-col'>
+          <div className='flex flex-row justify-end'></div>
+          <div className='flex w-full flex-col items-center justify-center'>
             <hr className='my-4' />
-            <div className='flex flex-col gap-6'>
-              {posts.map((post, index) => (
-                <PostComponent
+            <div className='flex w-full flex-col items-center justify-center gap-6'>
+              {assignments.map((assignment, index) => (
+                <MyAssignmentCard
                   key={index}
-                  id={post.id}
-                  username={post.username}
-                  date={post.date}
-                  content={post.content}
-                  likes={post.likes}
-                  comments={post.comments}
-                  liked={post.liked}
-                  onClick={handlePostClick}
-                  onLikeClick={handleLikeClick}
+                  id={assignment.id}
+                  title={assignment.title}
+                  dueDate={assignment.dueDate}
+                  description={assignment.description}
+                  owner={assignment.owner}
+                  workspaceId={assignment.workspaceId}
+                  submissionDate={assignment.submissionDate}
+                  onClick={handleTaskClick}
                 />
               ))}
             </div>
@@ -191,10 +184,16 @@ export default function NewsfeedPage({ params }: NewsfeedPageProps) {
           </div>
           <hr />
           <textarea
-            placeholder='Content ...'
+            placeholder='Title'
+            className='mb-4 h-14 w-full resize-none p-2 text-gray-800'
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <textarea
+            placeholder='Description ...'
             className='mb-4 h-32 w-full resize-none p-2 text-gray-800'
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
           />
 
           <div className='mt-4 grid grid-cols-3 gap-2'>
@@ -229,7 +228,7 @@ export default function NewsfeedPage({ params }: NewsfeedPageProps) {
 
             <p className='text-gray-800'>{images.length}/3</p>
           </div>
-          <GradientButton text='Post' onClick={handleUpload} />
+          <GradientButton text='Done' onClick={handleUpload} />
         </div>
       </Modal>
     </div>

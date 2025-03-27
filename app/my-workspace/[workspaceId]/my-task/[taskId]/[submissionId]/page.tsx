@@ -9,6 +9,7 @@ import CommentCard from '@/app/component/comment-card';
 import TextField from '@/app/component/text-field';
 import { isAfter, parseISO } from 'date-fns';
 import { format } from 'date-fns/fp';
+import OwnerWorkspaceSideBar from '@/app/component/owner-workspace-side-bar';
 
 interface ImageFile {
   file: File;
@@ -21,36 +22,29 @@ interface AssignmentImage {
   preview: string;
 }
 
-interface TaskDetailPageProps {
+interface AssignmentsubmissionDetailPageProps {
   params: Promise<{ workspaceId: string; taskId: string }>;
 }
 
-export default function TaskDetailPage({ params }: TaskDetailPageProps) {
+export default function AssignmentsubmissionDetailPage({
+  params,
+}: AssignmentsubmissionDetailPageProps) {
   const [taskId, setTask] = useState<string | null>(null);
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
   const [selectedImages, setSelectedImages] = useState<ImageFile[]>([]);
-  const [submittedImages, setSubmittedImages] = useState<ImageFile[]>([]);
   const [assignmentImages, setAssignmentImages] = useState<AssignmentImage[]>([
     { id: 1, name: 'Assignment-1', preview: '/api/placeholder/300/200' },
     { id: 2, name: 'Assignment-2', preview: '/api/placeholder/300/200' },
   ]);
 
+  const [score, setScore] = useState('');
+
+  const handleScore = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setScore(event.target.value);
+  };
+
   const [selectedAssignment, setSelectedAssignment] =
     useState<AssignmentImage | null>(null);
-
-  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files) return;
-
-    const newImages: ImageFile[] = Array.from(files)
-      .filter((file) => file.type.startsWith('image/'))
-      .map((file) => ({
-        file,
-        preview: URL.createObjectURL(file),
-      }));
-
-    setSelectedImages((prevImages) => [...prevImages, ...newImages]);
-  };
 
   const removeImage = (indexToRemove: number) => {
     setSelectedImages((prevImages) =>
@@ -171,9 +165,9 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
   if (status === 'submitted') {
     return (
       <div className='flex h-screen'>
-        <WorkspaceSideBar workspaceId={workspaceId} />
+        <OwnerWorkspaceSideBar workspaceId={workspaceId} invite_code='123' />
         <div className='flex-1 bg-gray-50'>
-          <Navbar />
+          <Navbar username='John Doe' />
           <div className='p-6'>
             <div className='p-4'>
               <div className='flex flex-row justify-between'>
@@ -198,9 +192,14 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
                         Due: {assignment.dueDate}
                       </p>
                     </div>
-                    <button className='h-12 w-32 rounded-md bg-gray-500 p-3 text-lg text-white'>
-                      Submitted
-                    </button>
+                    {!assignment.score && (
+                      <GradientButton text='Submit Score' width='w-40' />
+                    )}
+                    {assignment.score && (
+                      <button className='h-12 w-32 rounded-md bg-gray-600 p-3 text-lg text-white'>
+                        Submit score
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -210,13 +209,12 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
                   <p className='text-gray-800'>{assignment.description}</p>
                 </div>
                 <div>
-                  <p className='w-40 text-2xl text-gray-700'>
-                    {assignment.score ? `${assignment.score} Points` : ''}
-                  </p>
+                  {!assignment.score && (
+                    <TextField placeholder='score' onChange={handleScore} />
+                  )}
                 </div>
               </div>
               <div className='flex flex-row gap-2'>
-                c
                 {assignmentImages.map((assignment) => (
                   <div
                     key={assignment.id}
@@ -341,7 +339,7 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
                       </p>
                     </div>
                     <button className='h-12 w-32 rounded-md bg-gray-500 p-3 text-lg text-white'>
-                      Submit
+                      Submit Score
                     </button>
                   </div>
                 </div>
@@ -376,7 +374,7 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
               </div>
 
               <hr className='my-4' />
-              <div className='text-gray-700'>You cannot send this task.</div>
+              <div className='text-gray-700'>No file for this assignment.</div>
               {selectedImages.length > 0 && (
                 <div className='mt-4 grid grid-cols-3 gap-4'>
                   {selectedImages.map((image, index) => (
@@ -449,11 +447,8 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
                         Due: {assignment.dueDate}
                       </p>
                     </div>
-                    <button
-                      className='h-12 w-32 rounded-md bg-green-600 p-3 text-lg text-white'
-                      onClick={handleSubmit}
-                    >
-                      Submit
+                    <button className='h-12 w-40 rounded-md bg-gray-600 p-3 text-lg text-white'>
+                      Submit Score
                     </button>
                   </div>
                 </div>
@@ -465,7 +460,6 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
                 </div>
               </div>
               <div className='flex flex-row gap-2'>
-                c
                 {assignmentImages.map((assignment) => (
                   <div
                     key={assignment.id}
@@ -488,22 +482,7 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
               </div>
 
               <hr className='my-4' />
-              <div className='rounded-lg border-2 border-dashed border-gray-300 p-4'>
-                <input
-                  type='file'
-                  accept='image/*'
-                  multiple
-                  className='hidden'
-                  id='image-upload'
-                  onChange={handleImageSelect}
-                />
-                <label
-                  htmlFor='image-upload'
-                  className='flex cursor-pointer items-center justify-center text-gray-600'
-                >
-                  <Image className='mr-2' /> Add your Images
-                </label>
-              </div>
+
               {selectedImages.length > 0 && (
                 <div className='mt-4 grid grid-cols-3 gap-4'>
                   {selectedImages.map((image, index) => (
