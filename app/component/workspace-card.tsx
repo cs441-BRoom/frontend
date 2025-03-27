@@ -7,7 +7,7 @@ interface WorkspaceCardProps {
   title: string;
   date: string;
   description: string;
-  numberOfPeople: number;
+  numberOfPeople: int;
   onClick: (title: string) => void;
 }
 

@@ -1,23 +1,24 @@
 'use client';
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Navbar from '../component/navbar';
 import SidebarCustom from '../component/side-bar';
 import WorkspaceCard from '../component/workspace-card';
-import { useRouter } from 'next/navigation';
 import GradientButton from '../component/gradeint-button';
 import Modal from '../component/modal';
 import TextField from '../component/text-field';
+import { GetJoinedWorkspacesResponse } from '@/types/responses/workspace';
+import axiosInstance from '@/apis/axios';
 
 export default function HomePage() {
   const router = useRouter();
   const [isModalJoinOpen, setIsModalJoinOpen] = useState(false);
-  const [selectedWorkspace, setSelectedWorkspace] = useState<string | null>(
-    null
-  );
+  const [selectedWorkspace, setSelectedWorkspace] = useState<string | null>(null);
   const [inviteCode, setInviteCode] = useState('');
+  const [workspaces, setWorkspaces] = useState<GetJoinedWorkspacesResponse['workspaces'] | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
 
-  const formatDate = (timestamp: number) => {
+  const formatDate = (timestamp: string) => {
     const date = new Date(timestamp);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
@@ -27,122 +28,134 @@ export default function HomePage() {
   };
 
   const handleJoinWorkspace = async () => {
-    console.log(inviteCode);
-    closeModal();
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/auth/login'); // ถ้าไม่มี token ให้ไปหน้า login
+      return;
+    }
+
+    try {
+      // ใช้ axiosInstance แทนการใช้ axios
+      const response = await axiosInstance.post(
+        '/workspaces/join', // ส่งคำขอไปยัง API
+        { join_code: inviteCode },
+      );
+
+      // ถ้าคำขอสำเร็จ
+      if (response.status === 200) {
+        // ปิด modal
+        closeModal();
+
+        // อัพเดต workspaces โดยการ fetch ใหม่
+        fetchWorkspaces();
+      } else {
+        // ถ้ามีข้อผิดพลาด
+        alert('Failed to join workspace');
+      }
+    } catch (error) {
+      console.error('Error joining workspace:', error);
+      alert('Error joining workspace');
+    }
   };
+
   const handleInviteCode = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInviteCode(event.target.value);
   };
 
-  function closeModal() {
+  const closeModal = () => {
     setIsModalJoinOpen(false);
-  }
-
-  const currentDate = Date.now();
+  };
 
   const handleWorkspaceClick = (title: string) => {
     setSelectedWorkspace(title);
     router.push(`/workspace/${title}/news-feed`);
-    console.log(selectedWorkspace);
   };
 
-  const workspaceData = [
-    {
-      id: 'aaa',
-      title: 'Workspace1',
-      date: formatDate(currentDate),
-      description:
-        'A workspace is a digital area where you can organize projects, tasks, and collaborate with your team.',
-      numberOfPeople: 10,
-    },
-    {
-      id: 'bbb',
-      title: 'Workspace 2',
-      date: 'Jan 20, 2025',
-      description: 'A workspace where ideas come to life with your team.',
-      numberOfPeople: 5,
-    },
-    {
-      id: 'ccc',
-      title: 'Workspace 3',
-      date: 'Feb 18, 2025',
-      description:
-        'Collaborate and manage your projects seamlessly in this workspace.',
-      numberOfPeople: 8,
-    },
-    {
-      id: 'ddd',
-      title: 'Workspace 4',
-      date: 'Mar 10, 2025',
-      description:
-        'A digital space for managing team projects and collaborating.',
-      numberOfPeople: 12,
-    },
-    {
-      id: 'ddd',
-      title: 'Workspace 5',
-      date: 'Apr 22, 2025',
-      description:
-        'A dedicated workspace to organize tasks and communicate with your team.',
-      numberOfPeople: 15,
-    },
-    {
-      id: 'eee',
-      title: 'Workspace 5',
-      date: 'Apr 22, 2025',
-      description:
-        'A dedicated workspace to organize tasks and communicate with your team.',
-      numberOfPeople: 15,
-    },
-  ];
+  const fetchWorkspaces = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/auth/login');
+      return;
+    }
+
+    try {
+      const response = await axiosInstance.get<GetJoinedWorkspacesResponse>('/workspaces/joined', {
+        headers: {
+          Authorization: `Bearer ${token}`, // ใช้ token ที่เก็บไว้
+        },
+      });
+      setWorkspaces(response.data.workspaces);
+    } catch (error) {
+      console.error('Error fetching workspaces:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch joined workspaces on component mount
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/auth/login');
+      return;
+    }
+
+    fetchWorkspaces();
+  }, [router]);
+
   return (
-    <div className='flex h-screen'>
+    <div className="flex h-screen">
       <SidebarCustom />
 
-      <div className='flex-1 bg-gray-50'>
+      <div className="flex-1 bg-gray-50">
         <Navbar />
-        <div className='m-4 flex flex-row justify-end gap-4'>
+        <div className="m-4 flex flex-row justify-end gap-4">
           <GradientButton
-            text='Join workspace'
-            width='w-40'
+            text="Join workspace"
+            width="w-40"
             onClick={() => setIsModalJoinOpen(true)}
           />
         </div>
-        <hr className='my-4' />
-        <div className='p-6'>
-          <div className='grid grid-cols-3 gap-6'>
-            {workspaceData.map((workspace, index) => (
-              <WorkspaceCard
-                key={index}
-                id={workspace.id}
-                title={workspace.title}
-                date={workspace.date}
-                description={workspace.description}
-                numberOfPeople={workspace.numberOfPeople}
-                onClick={handleWorkspaceClick}
-              />
-            ))}
-          </div>
+        <hr className="my-4" />
+        <div className="p-6">
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            <div className="grid grid-cols-3 gap-6">
+              {workspaces?.map((workspace, index) => (
+                <WorkspaceCard
+                  key={index}
+                  id={workspace.workspace_id.toString()}
+                  title={workspace.name}
+                  date={formatDate(workspace.created_at)}
+                  description={workspace.description}
+                  numberOfPeople={workspace.members_count}
+                  onClick={handleWorkspaceClick}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       <Modal isOpen={isModalJoinOpen} onClose={closeModal}>
-        <div className='flex w-full items-center justify-between text-gray-800'>
-          <h2 className='flex-grow text-center text-2xl text-gray-800'>
+        <div className="flex w-full items-center justify-between text-gray-800">
+          <h2 className="flex-grow text-center text-2xl text-gray-800">
             Join workspace
           </h2>
         </div>
-        <div className='flex h-full w-full flex-col gap-4'>
-          <hr className='my-4' />
+        <div className="flex h-full w-full flex-col gap-4">
+          <hr className="my-4" />
           <TextField
-            placeholder='Invite code'
+            placeholder="Invite code"
+            value={inviteCode}
             onChange={handleInviteCode}
-          ></TextField>
+          />
 
           <GradientButton
-            text='Join'
+            text="Join"
             onClick={handleJoinWorkspace}
-          ></GradientButton>
+          />
         </div>
       </Modal>
     </div>
