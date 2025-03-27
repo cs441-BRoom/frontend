@@ -2,13 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '@/app/component/navbar';
 import WorkspaceSideBar from '@/app/component/workspace-side-bar';
-import GradientButton from '@/app/component/gradeint-button';
-import PostComponent from '@/app/component/post';
-import { FileText, Heart, Image, X } from 'lucide-react';
-import CommentCard from '@/app/component/comment-card';
-import TextField from '@/app/component/text-field';
+import { FileText, Image, X } from 'lucide-react';
 import { isAfter, parseISO } from 'date-fns';
-import { format } from 'date-fns/fp';
 
 interface ImageFile {
   file: File;
@@ -29,7 +24,6 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
   const [taskId, setTask] = useState<string | null>(null);
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
   const [selectedImages, setSelectedImages] = useState<ImageFile[]>([]);
-  const [submittedImages, setSubmittedImages] = useState<ImageFile[]>([]);
   const [assignmentImages, setAssignmentImages] = useState<AssignmentImage[]>([
     { id: 1, name: 'Assignment-1', preview: '/api/placeholder/300/200' },
     { id: 2, name: 'Assignment-2', preview: '/api/placeholder/300/200' },

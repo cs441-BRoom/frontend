@@ -5,7 +5,6 @@ import WorkspaceSideBar from '@/app/component/workspace-side-bar';
 import GradientButton from '@/app/component/gradeint-button';
 import PostComponent from '@/app/component/post';
 import { useRouter } from 'next/navigation';
-import { Modak } from 'next/font/google';
 import Modal from '@/app/component/modal';
 import { Image, X, XIcon } from 'lucide-react';
 

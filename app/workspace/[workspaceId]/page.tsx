@@ -1,7 +1,5 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import Navbar from '@/app/component/navbar';
-import WorkspaceSideBar from '@/app/component/workspace-side-bar';
 
 interface WorkspaceDetailPageProps {
   params: Promise<{ workspaceId: string }>;
