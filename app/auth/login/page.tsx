@@ -14,7 +14,7 @@ export default function LoginPage() {
   const handleLogin = () => {
     console.log('click');
     console.log(username + ' ' + password);
-    router.push('/auth/login');
+    router.push('/home');
   };
 
   const handleUsername = (event: React.ChangeEvent<HTMLInputElement>) => {
