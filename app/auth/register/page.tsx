@@ -4,65 +4,114 @@ import PasswordTextField from '@/app/component/password-field';
 import TextField from '@/app/component/text-field';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { RegisterRequest } from '@/types/requests/auth';
+import axiosInstance from '@/apis/axios';
+import { RegisterResponse } from '@/types/responses/auth';
 
 export default function RegisterPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastname] = useState('');
-  const [confirmPassword, setComfirmPassword] = useState('');
+  const [formData, setFormData] = useState<RegisterRequest>({
+    username: '',
+    firstname: '',
+    lastname: '',
+    email: '',
+    password: '',
+    password_confirmation: '',
+  });
 
+  const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
-  const handleRegister = () => {
-    console.log(username + ' ' + password);
-    router.push('/auth/login');
+  // 🎯 Handle input changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleUsername = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(event.target.value);
+  // 🎯 Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await axiosInstance.post<RegisterResponse>(
+        '/auth/register',
+        formData,
+      );
+      console.log(response.data.message);
+      router.push('/auth/login');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to register.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handlePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(event.target.value);
+  const handleRegisterClick = () => {
+    handleSubmit({
+      preventDefault: () => {
+      },
+    } as React.FormEvent);
   };
 
-  const handleFirstName = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFirstName(event.target.value);
-  };
-
-  const handleLastName = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setLastname(event.target.value);
-  };
-
-  const handleConfirmPassword = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setComfirmPassword(event.target.value);
-  };
 
   return (
-    <div className='flex h-64 min-h-screen w-full items-center justify-center bg-gradient-to-r from-[#2596be] via-[#1c9e56] to-[#1c9e56]'>
-      <div className='flex h-[72%] w-full max-w-md flex-col gap-6 rounded-xl bg-white p-8 shadow-lg'>
-        <p className='mb-5 text-center text-6xl font-normal text-[#363636]'>
+    <div
+      className="flex h-64 min-h-screen w-full items-center justify-center bg-gradient-to-r from-[#2596be] via-[#1c9e56] to-[#1c9e56]">
+      <div className="flex h-[72%] w-full max-w-md flex-col gap-6 rounded-xl bg-white p-8 shadow-lg">
+        <p className="mb-5 text-center text-6xl font-normal text-[#363636]">
           BRoom
         </p>
-        <p className='mb-5 text-center text-2xl font-normal text-[#363636]'>
+        <p className="mb-5 text-center text-2xl font-normal text-[#363636]">
           Register
         </p>
-        <hr className='mb-4' />
-        <TextField placeholder='First name' onChange={handleFirstName} />
-        <TextField placeholder='Last name' onChange={handleLastName} />
-        <TextField placeholder='Username' onChange={handleUsername} />
-        <PasswordTextField placeholder='Password' onChange={handlePassword} />
-        <PasswordTextField
-          placeholder='Confirm Password'
-          onChange={handleConfirmPassword}
+        <hr className="mb-4" />
+
+        {/* ✅ ใช้ handleChange และ name attribute เพื่อลดโค้ดซ้ำซ้อน */}
+        <TextField
+          name="firstname"
+          placeholder="First name"
+          onChange={handleChange}
         />
-        <GradientButton text='Register' onClick={handleRegister} />
+        <TextField
+          name="lastname"
+          placeholder="Last name"
+          onChange={handleChange}
+        />
+        <TextField
+          name="username"
+          placeholder="Username"
+          onChange={handleChange}
+        />
+        <TextField
+          name="email"
+          type="email"
+          placeholder="Email"
+          onChange={handleChange}
+        />
+        <PasswordTextField
+          name="password"
+          placeholder="Password"
+          onChange={handleChange}
+        />
+        <PasswordTextField
+          name="password_confirmation"
+          placeholder="Confirm Password"
+          onChange={handleChange}
+        />
+
+        {/* 🔥 แสดง error ถ้ามี */}
+        {error && <p className="text-center text-red-500">{error}</p>}
+
+        {/* 🔥 ปิดปุ่มระหว่างโหลด */}
+        <GradientButton
+          text={loading ? 'Registering...' : 'Register'}
+          onClick={handleRegisterClick}
+          disabled={loading}
+        />
         <a
-          href='/auth/login'
-          className='cursor-pointer text-center text-lg font-normal text-[#1c9e56]'
+          href="/auth/login"
+          className="cursor-pointer text-center text-lg font-normal text-[#1c9e56]"
         >
           Back to login
         </a>
