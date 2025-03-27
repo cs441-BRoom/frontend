@@ -9,7 +9,7 @@ interface WorkspaceSideBarProps {
   workspaceId?: string;
 }
 
-export default function NewsfeedPage({ workspaceId }: WorkspaceSideBarProps) {
+export default function WorkspaceSideBar({ workspaceId }: WorkspaceSideBarProps) {
   const pathname = usePathname();
 
   const menuItems = [
@@ -19,9 +19,9 @@ export default function NewsfeedPage({ workspaceId }: WorkspaceSideBarProps) {
       href: `/workspace/${workspaceId}/news-feed`,
     },
     {
-      icon: LayoutGrid,
+      icon: BookText,
       label: 'Task',
-      href: '/main/team',
+      href: `/workspace/${workspaceId}/task`,
     },
   ];
   return (
