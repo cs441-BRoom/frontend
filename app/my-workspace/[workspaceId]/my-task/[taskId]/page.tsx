@@ -31,12 +31,12 @@ export default function MyTaskDetailPage({ params }: MyTaskDetailPageProps) {
     fetchData();
   }, [params]);
 
-  const handleTaskClick = (tasktId: string) => {
-    setTaskId(tasktId);
+  const handleTaskClick = (submissionId: string) => {
+    setsubmissionId(submissionId);
     router.push(
-      `/my-workspace/${workspaceId}/my-task/${tasktId}/${submissionId}`
+      `/my-workspace/${workspaceId}/my-task/${taskId}/${submissionId}`
     );
-    console.log(tasktId);
+    console.log(taskId);
   };
 
   const assignments = [
