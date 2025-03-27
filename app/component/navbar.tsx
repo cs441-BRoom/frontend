@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { Image, Settings, User } from 'lucide-react';
+import { Image, LogOut, Settings, User } from 'lucide-react';
 import Modal from './modal';
 import GradientButton from './gradeint-button';
 import TextField from './text-field';
@@ -36,6 +36,10 @@ export default function Navbar() {
     console.log('Email: ', email);
   };
 
+  const handleLogout = () => {
+    console.log('Logout');
+  };
+
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       setImage(event.target.files[0]);
@@ -53,6 +57,9 @@ export default function Navbar() {
         </button>
         <div className='flex h-10 w-10 items-center justify-center rounded-full bg-gray-300'>
           <User size={20} className='text-gray-600' />
+        </div>
+        <div className='cursor-pointer' onClick={handleLogout}>
+          <LogOut className='text-gray-600' />
         </div>
 
         <Modal isOpen={isModalOpen} onClose={closeModal}>
