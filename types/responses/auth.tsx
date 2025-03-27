@@ -26,5 +26,5 @@ export interface LoginResponse {
 }
 
 export interface LogoutResponse {
-  message: 'Logged out successfully';
+  message: 'string';
 }
