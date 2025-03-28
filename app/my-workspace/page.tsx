@@ -47,6 +47,7 @@ export default function MyWorkspacePage() {
       });
 
       setWorkspaces(response.data.workspaces); // เก็บข้อมูล workspaces
+      console.log(response.data.workspaces)
     } catch (error) {
       console.error('Error fetching workspaces:', error);
     } finally {
@@ -119,9 +120,11 @@ export default function MyWorkspacePage() {
     setIsModalOpen(false);
   }
 
-  const handleWorkspaceClick = (workspaceId: number) => {
-    router.push(`/my-workspace/${workspaceId}/news-feed`);
+  const handleWorkspaceClick = (workspace: StoreRespond['workspace']) => {
+    const { workspace_id, name, description, join_code, members_count, created_at, updated_at } = workspace;
+    router.push(`/my-workspace/${workspace_id}/news-feed?workspace_id=${workspace_id}&name=${name}&description=${description}&join_code=${join_code}&members_count=${members_count}&created_at=${created_at}&updated_at=${updated_at}`);
   };
+
 
   return (
     <div className="flex h-screen">
@@ -145,12 +148,12 @@ export default function MyWorkspacePage() {
               {workspaces?.map((workspace, index) => (
                 <WorkspaceCard
                   key={index}
-                  id={workspace.workspace_id.toString()}
+                  id={workspace.workspace_id}
                   title={workspace.name}
                   date={formatDate(workspace.created_at)}
                   description={workspace.description}
-                  numberOfPeople={parseInt(workspace.members_count, 10)} // เนื่องจาก members_count เป็น string ให้แปลงเป็น number
-                  onClick={() => handleWorkspaceClick(workspace.workspace_id)}
+                  numberOfPeople={workspace.members_count}
+                  onClick={() => handleWorkspaceClick(workspace)}
                 />
               ))}
             </div>

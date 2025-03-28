@@ -6,12 +6,13 @@ import GradientButton from '@/app/component/gradeint-button';
 import { Heart } from 'lucide-react';
 import CommentCard from '@/app/component/comment-card';
 import TextField from '@/app/component/text-field';
+import OwnerWorkspaceSideBar from '@/app/component/owner-workspace-side-bar';
 
-interface PostDetailPageProps {
-  params: Promise<{ workspaceId: string; postId: string }>;
+interface MyworkspacePostDetailPageProps {
+  params: Promise<{ workspaceId: string; newsId: string }>;
 }
 
-export default function PostDetailPage({ params }: PostDetailPageProps) {
+export default function MyWorkspacePostDetailPage({ params }: MyworkspacePostDetailPageProps) {
   const [postId, setPostId] = useState<string | null>(null);
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
   const [newComment, setNewComment] = useState<string>('');
@@ -74,7 +75,7 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
   useEffect(() => {
     const fetchData = async () => {
       const resolvedParams = await params;
-      setPostId(resolvedParams.postId);
+      setPostId(resolvedParams.newsId);
       setWorkspaceId(resolvedParams.workspaceId);
 
       console.log('workspaceId ' + workspaceId);
@@ -93,44 +94,44 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
   }
 
   return (
-    <div className='flex h-screen'>
-      <WorkspaceSideBar id={workspaceId} />
-      <div className='flex-1 bg-gray-50'>
+    <div className="flex h-screen">
+      <OwnerWorkspaceSideBar workspaceId={workspaceId} invite_code="123" />
+      <div className="flex-1 bg-gray-50">
         <Navbar />
-        <div className='p-6'>
-          <div className='flex-column flex'>
-            <div className='w-full justify-end'>
-              <div className='mb-3 flex items-center'>
-                <div className='mr-3 h-10 w-10 rounded-full bg-gray-300'></div>
-                <div className='flex-grow'>
-                  <div className='text-lg font-medium text-gray-800'>
+        <div className="p-6">
+          <div className="flex-column flex">
+            <div className="w-full justify-end">
+              <div className="mb-3 flex items-center">
+                <div className="mr-3 h-10 w-10 rounded-full bg-gray-300"></div>
+                <div className="flex-grow">
+                  <div className="text-lg font-medium text-gray-800">
                     {postId}
                   </div>
-                  <div className='text-1xl text-gray-500'>{post.date}</div>
+                  <div className="text-1xl text-gray-500">{post.date}</div>
                 </div>
               </div>
 
-              <p className='mb-3 text-lg text-gray-700'>{post.content}</p>
+              <p className="mb-3 text-lg text-gray-700">{post.content}</p>
               {post.images.length > 0 && (
-                <div className='my-3 grid grid-cols-3 gap-2'>
+                <div className="my-3 grid grid-cols-3 gap-2">
                   {post.images.map((image, index) => (
                     <img
                       key={index}
                       src={image}
                       alt={`Post Image ${index}`}
-                      className='h-40 w-full rounded-lg object-cover'
+                      className="h-40 w-full rounded-lg object-cover"
                     />
                   ))}
                 </div>
               )}
 
-              <hr className='my-2' />
-              <div className='mt-3 flex items-center justify-between text-sm text-gray-500'>
-                <div className='flex items-center'>
-                  <span className='mr-2'>
-                    <div className='cursor-pointer' onClick={handleLike}>
+              <hr className="my-2" />
+              <div className="mt-3 flex items-center justify-between text-sm text-gray-500">
+                <div className="flex items-center">
+                  <span className="mr-2">
+                    <div className="cursor-pointer" onClick={handleLike}>
                       {post.liked ? (
-                        <Heart className='text-red-600' fill='red' />
+                        <Heart className="text-red-600" fill="red" />
                       ) : (
                         <Heart />
                       )}
@@ -139,14 +140,14 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
                   <span>{post.likes}</span>
                 </div>
                 <div>
-                  <span>{post.commentsCount} Comments</span>
+                  <span>{post.commentsCount} Comments </span>
                 </div>
               </div>
             </div>
           </div>
 
-          <hr className='my-3' />
-          <div className='max-h-[400px] min-h-[400px] overflow-y-auto border border-gray-300 p-3'>
+          <hr className="my-3" />
+          <div className="max-h-[400px] min-h-[400px] overflow-y-auto border border-gray-300 p-3">
             {comments.map((comment, index) => (
               <CommentCard
                 key={index}
@@ -158,13 +159,13 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
             ))}
           </div>
         </div>
-        <div className='flex flex-row gap-1.5'>
+        <div className="flex flex-row gap-1.5">
           <TextField
-            placeholder='Comment'
+            placeholder="Comment"
             value={newComment}
             onChange={handleNewComment}
           />
-          <GradientButton text='send' width='w-40' onClick={handleAddComment} />
+          <GradientButton text="send" width="w-40" onClick={handleAddComment} />
         </div>
       </div>
     </div>

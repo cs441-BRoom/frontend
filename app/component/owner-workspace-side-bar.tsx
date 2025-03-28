@@ -3,15 +3,16 @@ import React from 'react';
 import { LayoutGrid, BookText, MoveLeft } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useRouter } from 'next/router';
 
 interface OwnerWorkspaceSideBarProps {
-  workspaceId: string;
+  workspaceId: number;
+  title: string;
   invite_code: string;
 }
 
 export default function OwnerWorkspaceSideBar({
   workspaceId,
+  title,
   invite_code,
 }: OwnerWorkspaceSideBarProps) {
   const pathname = usePathname();
@@ -40,7 +41,7 @@ export default function OwnerWorkspaceSideBar({
 
       <hr />
       <h2 className='mt-5 mb-3 text-xl font-semibold text-gray-800'>
-        {workspaceId}
+        {title}
       </h2>
       <h2 className='mt-5 mb-3 text-sm font-semibold text-gray-800'>
         Invide code : {invite_code}

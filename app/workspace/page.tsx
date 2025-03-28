@@ -7,13 +7,12 @@ import WorkspaceCard from '../component/workspace-card';
 import GradientButton from '../component/gradeint-button';
 import Modal from '../component/modal';
 import TextField from '../component/text-field';
-import { GetJoinedWorkspacesResponse } from '@/types/responses/workspace';
+import { GetJoinedWorkspacesResponse, StoreRespond } from '@/types/responses/workspace';
 import axiosInstance from '@/apis/axios';
 
 export default function JoinedWorkspace() {
   const router = useRouter();
   const [isModalJoinOpen, setIsModalJoinOpen] = useState(false);
-  const [selectedWorkspace, setSelectedWorkspace] = useState<number | null>(null);
   const [inviteCode, setInviteCode] = useState('');
   const [workspaces, setWorkspaces] = useState<GetJoinedWorkspacesResponse['workspaces'] | undefined>(undefined);
   const [loading, setLoading] = useState(true);
@@ -66,10 +65,6 @@ export default function JoinedWorkspace() {
     setIsModalJoinOpen(false);
   };
 
-  const handleWorkspaceClick = (id: number) => {
-    setSelectedWorkspace(id);
-    router.push(`/workspace/${id}/news-feed`);
-  };
 
   const fetchWorkspaces = async () => {
     const token = localStorage.getItem('token');
@@ -103,6 +98,13 @@ export default function JoinedWorkspace() {
     fetchWorkspaces();
   }, [router]);
 
+
+  const handleWorkspaceClick = (workspace: StoreRespond['workspace']) => {
+    const { workspace_id, name, description, members_count, created_at, updated_at } = workspace;
+    router.push(`/workspace/${workspace_id}/news-feed?workspace_id=${workspace_id}&name=${name}&description=${description}&members_count=${members_count}&created_at=${created_at}&updated_at=${updated_at}`);
+  };
+
+
   return (
     <div className="flex h-screen">
       <SidebarCustom />
@@ -125,12 +127,12 @@ export default function JoinedWorkspace() {
               {workspaces?.map((workspace, index) => (
                 <WorkspaceCard
                   key={index}
-                  id={workspace.workspace_id.toString()}
+                  id={workspace.workspace_id}
                   title={workspace.name}
                   date={formatDate(workspace.created_at)}
                   description={workspace.description}
                   numberOfPeople={workspace.members_count}
-                  onClick={handleWorkspaceClick}
+                  onClick={() => handleWorkspaceClick(workspace)}
                 />
               ))}
             </div>
