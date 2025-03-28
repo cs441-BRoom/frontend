@@ -37,7 +37,7 @@ export interface GetJoinedWorkspacesResponse {
 
       members_count: string;
 
-      created_by: 0;
+      created_by: string;
 
       created_at: string;
 

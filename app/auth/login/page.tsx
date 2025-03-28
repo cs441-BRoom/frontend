@@ -5,16 +5,43 @@ import PasswordTextField from '@/app/component/password-field';
 import TextField from '@/app/component/text-field';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import axiosInstance from '@/apis/axios';
+import { LoginResponse } from '@/types/responses/auth';
+import { LoginRequest } from '@/types/requests/auth';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleLogin = () => {
-    console.log('click');
-    console.log(username + ' ' + password);
-    router.push('/home');
+  
+  const handleLogin = async () => {
+    setLoading(true); 
+    setError(''); 
+
+    const loginData: LoginRequest = { username, password };
+
+    try {
+      const response = await axiosInstance.post<LoginResponse>('/auth/login', loginData);
+
+      
+      console.log(response.data.message);
+      console.log(response.data.user);
+      console.log(response.data.token);
+
+      
+      localStorage.setItem('token', response.data.token);
+
+      
+      router.push('/workspace');
+    } catch (err: any) {
+      
+      setError(err.response?.data?.message || 'Login failed.');
+    } finally {
+      setLoading(false); 
+    }
   };
 
   const handleUsername = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,13 +62,19 @@ export default function LoginPage() {
           Welcome to BRoom
         </p>
         <hr className='mb-4' />
+        {error && <p className="text-red-500 text-center">{error}</p>} {/* แสดงข้อผิดพลาด */}
         <TextField placeholder='Username' onChange={handleUsername}></TextField>
         <PasswordTextField
           placeholder='Password'
           onChange={handlePassword}
         ></PasswordTextField>
 
-        <GradientButton text='Sign in' onClick={handleLogin}></GradientButton>
+        <GradientButton
+          text={loading ? 'Signing in...' : 'Sign in'} 
+          onClick={handleLogin}
+          disabled={loading} 
+        ></GradientButton>
+
         <div className='flex flex-row gap-4'>
           <p className='mb-5 text-center text-lg font-normal text-[#363636]'>
             You don’t have an account ?

@@ -6,10 +6,13 @@ import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
 
 interface WorkspaceSideBarProps {
-  workspaceId?: string;
+  workspaceId?: number;
+  title: string;
 }
 
-export default function WorkspaceSideBar({ workspaceId }: WorkspaceSideBarProps) {
+export default function WorkspaceSideBar({
+                                           workspaceId, title,
+                                         }: WorkspaceSideBarProps) {
   const pathname = usePathname();
 
   const menuItems = [
@@ -25,18 +28,18 @@ export default function WorkspaceSideBar({ workspaceId }: WorkspaceSideBarProps)
     },
   ];
   return (
-    <div className='h-full w-64 border-r bg-white px-4 py-6'>
+    <div className="h-full w-64 border-r bg-white px-4 py-6">
       <Link
-        href='/home'
-        className='flex cursor-pointer items-center gap-2 p-3 text-gray-800'
+        href="/workspace"
+        className="flex cursor-pointer items-center gap-2 p-3 text-gray-800"
       >
         <MoveLeft size={20} />
-        <h2 className='text-lg font-semibold'>Back to home</h2>
+        <h2 className="text-lg font-semibold">Back to home</h2>
       </Link>
 
       <hr />
-      <h2 className='mt-5 mb-3 text-xl font-semibold text-gray-800'>
-        {workspaceId}
+      <h2 className="mt-5 mb-3 text-xl font-semibold text-gray-800">
+        {title}
       </h2>
       <hr />
       <nav>
@@ -50,7 +53,7 @@ export default function WorkspaceSideBar({ workspaceId }: WorkspaceSideBarProps)
                 : 'text-gray-600 hover:bg-gray-100'
             } `}
           >
-            <item.icon size={20} className='mr-3' />
+            <item.icon size={20} className="mr-3" />
             {item.label}
           </Link>
         ))}
