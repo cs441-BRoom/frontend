@@ -39,7 +39,7 @@ export default function RegisterPage() {
     try {
       const response = await axiosInstance.post<RegisterResponse>(
         '/auth/register',
-        formData,
+        formData
       );
       console.log(response.data.message);
       router.push('/auth/login');
@@ -53,65 +53,62 @@ export default function RegisterPage() {
 
   const handleRegisterClick = () => {
     handleSubmit({
-      preventDefault: () => {
-      },
+      preventDefault: () => {},
     } as React.FormEvent);
   };
 
-
   return (
-    <div
-      className="flex h-64 min-h-screen w-full items-center justify-center bg-gradient-to-r from-[#2596be] via-[#1c9e56] to-[#1c9e56]">
-      <div className="flex h-[72%] w-full max-w-md flex-col gap-6 rounded-xl bg-white p-8 shadow-lg">
-        <p className="mb-5 text-center text-6xl font-normal text-[#363636]">
+    <div className='flex h-64 min-h-screen w-full items-center justify-center bg-gradient-to-r from-[#2596be] via-[#1c9e56] to-[#1c9e56]'>
+      <div className='flex h-[80%] w-full max-w-md flex-col gap-4 rounded-xl bg-white p-8 shadow-lg'>
+        <p className='mb-5 text-center text-6xl font-normal text-[#363636]'>
           BRoom
         </p>
-        <p className="mb-5 text-center text-2xl font-normal text-[#363636]">
+        <p className='mb-5 text-center text-2xl font-normal text-[#363636]'>
           Register
         </p>
-        <hr className="mb-4" />
+        <hr className='mb-4' />
 
         {/* ✅ ใช้ handleChange และ name attribute เพื่อลดโค้ดซ้ำซ้อน */}
         <TextField
-          name="firstname"
+          name='firstname'
           value={formData.firstname}
-          placeholder="First name"
+          placeholder='First name'
           onChange={handleChange}
         />
         <TextField
-          name="lastname"
+          name='lastname'
           value={formData.lastname}
-          placeholder="Last name"
+          placeholder='Last name'
           onChange={handleChange}
         />
         <TextField
-          name="username"
+          name='username'
           value={formData.username}
-          placeholder="Username"
+          placeholder='Username'
           onChange={handleChange}
         />
         <TextField
-          name="email"
+          name='email'
           value={formData.email}
-          type="email"
-          placeholder="Email"
+          type='email'
+          placeholder='Email'
           onChange={handleChange}
         />
         <PasswordTextField
-          name="password"
-          placeholder="Password"
-          value={formData.password}  // แก้ไขเป็น formData.password
+          name='password'
+          placeholder='Password'
+          value={formData.password} // แก้ไขเป็น formData.password
           onChange={handleChange}
         />
         <PasswordTextField
-          name="password_confirmation"
-          placeholder="Confirm Password"
-          value={formData.password_confirmation}  // แก้ไขเป็น formData.password_confirmation
+          name='password_confirmation'
+          placeholder='Confirm Password'
+          value={formData.password_confirmation} // แก้ไขเป็น formData.password_confirmation
           onChange={handleChange}
         />
 
         {/* 🔥 แสดง error ถ้ามี */}
-        {error && <p className="text-center text-red-500">{error}</p>}
+        {error && <p className='text-center text-red-500'>{error}</p>}
 
         {/* 🔥 ปิดปุ่มระหว่างโหลด */}
         <GradientButton
@@ -120,8 +117,8 @@ export default function RegisterPage() {
           disabled={loading}
         />
         <a
-          href="/auth/login"
-          className="cursor-pointer text-center text-lg font-normal text-[#1c9e56]"
+          href='/auth/login'
+          className='cursor-pointer text-center text-lg font-normal text-[#1c9e56]'
         >
           Back to login
         </a>
