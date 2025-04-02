@@ -10,7 +10,7 @@ import { getAssignmentById } from '@/lib/apis/api';
 import { Assignment } from '@/types/assignment';
 
 interface AssignmentDetailPageProps {
-  params: Promise<{ workspaceId: string; assignmentId: number }>;
+  params: Promise<{ workspace_id: string; assignment_id: number }>;
 }
 
 interface ImageFile {
@@ -30,8 +30,8 @@ export default function AssignmentDetailPage({ params }: AssignmentDetailPagePro
   const [submissionId, setsubmissionId] = useState<string | null>(null);
   const unwrappedParams = use(params);
   const {user} = useAuth()
-  const workspaceId = Number(unwrappedParams.workspaceId);
-  const assignmentId = Number(unwrappedParams.assignmentId);
+  const workspaceId = Number(unwrappedParams.workspace_id);
+  const assignmentId = Number(unwrappedParams.assignment_id);
   const { selectedWorkspace } = useWorkspace();
   const [showOwned, setShowOwned] = useState<boolean>(false);
   const [selectedImages, setSelectedImages] = useState<ImageFile[]>([]);
@@ -43,7 +43,6 @@ export default function AssignmentDetailPage({ params }: AssignmentDetailPagePro
   const router = useRouter();
 
   useEffect(() => {
-    console.log("assignmentId:" + assignmentId)
       const loadAssignment = async () => {
         try {
            
@@ -55,7 +54,7 @@ export default function AssignmentDetailPage({ params }: AssignmentDetailPagePro
       };
   
       loadAssignment();
-    }, [workspaceId]);
+    }, [assignmentId]);
 
 
   const handleTaskClick = (submissionId: string) => {
@@ -121,42 +120,6 @@ export default function AssignmentDetailPage({ params }: AssignmentDetailPagePro
     }
   }, [selectedWorkspace, user]);
 
-
-  const submission = [
-    {
-      id: '1',
-      dueDate: '2025-04-01T12:00:00Z',
-      username: 'JohnDoe',
-      workspaceId: 'W001',
-      submissionDate: '2025-03-30T10:00:00Z',
-      assignmentId: 'A001',
-    },
-    {
-      id: '2',
-      dueDate: '2025-04-05T18:00:00Z',
-      username: 'JaneSmith',
-      workspaceId: 'W002',
-      submissionDate: null, // ยังไม่ได้ส่ง
-      assignmentId: 'A002',
-    },
-    {
-      id: '3',
-      dueDate: '2025-04-03T15:00:00Z',
-      username: 'AliceBrown',
-      workspaceId: 'W003',
-      submissionDate: '2025-04-02T20:00:00Z',
-      assignmentId: 'A003',
-    },
-    {
-      id: '4',
-      dueDate: '2025-04-07T09:00:00Z',
-      username: 'BobWilson',
-      workspaceId: 'W004',
-      submissionDate: null, // ยังไม่ได้ส่ง
-      assignmentId: 'A004',
-    },
-  ];
-  
   if(showOwned){
 
   return (
