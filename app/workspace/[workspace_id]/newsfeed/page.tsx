@@ -152,6 +152,14 @@ export default function NewsFeedPage({ params }: NewsfeedPageProps) {
     }
   };
 
+  const closeModal = () => {
+    setTitle(''); // รีเซ็ต title
+    setDescription(''); // รีเซ็ต description
+    setFiles([]); // รีเซ็ต files
+    setPreviews([]); // รีเซ็ต previews
+    setIsModalOpen(false); // ปิด Modal
+  };
+
   return (
     <div className="flex h-screen">
       <div className="flex-1 bg-gray-50 overflow-y-auto">
@@ -188,7 +196,7 @@ export default function NewsFeedPage({ params }: NewsfeedPageProps) {
         </div>
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+      <Modal isOpen={isModalOpen} onClose={closeModal}>
         <div className="flex w-full items-center justify-between text-gray-800">
           <h2 className="flex-grow text-center text-2xl text-gray-800">Create Post</h2>
         </div>
