@@ -133,7 +133,7 @@ export const createAssignment = async (
     formData.append('due_date', assignment.due_date);
 
     assignment.files.forEach((file) => {
-      formData.append('files', file);
+      formData.append('files[]', file);
     });
 
     const response = await axiosInstance.post('/assignments', formData, {
