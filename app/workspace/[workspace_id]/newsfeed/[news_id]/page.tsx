@@ -25,12 +25,14 @@ export default function NewsDetailPage({ params }: NewsDetailPageProps) {
   const [newComment, setNewComment] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isCommenting, setIsCommenting] = useState(false);
+  const [isFetchingComments, setIsFetchingComments] = useState(false);
   const commentsEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
+        setIsFetchingComments(true);
         const [newsData, commentsData] = await Promise.all([
           getNewsById(newsId, workspaceId),
           getCommentsByNewsId(newsId),
@@ -41,6 +43,7 @@ export default function NewsDetailPage({ params }: NewsDetailPageProps) {
         console.error('Error fetching data:', error);
       } finally {
         setIsLoading(false);
+        setIsFetchingComments(false);
       }
     };
 
@@ -98,10 +101,9 @@ export default function NewsDetailPage({ params }: NewsDetailPageProps) {
     try {
       setIsCommenting(true);
       const comment = await createComment(news.news_id, newComment);
-      setComments(prev => [...prev, comment]); // Add new comment to the end
+      setComments(prev => [...prev, comment]);
       setNewComment('');
 
-      // Update comment count in news
       setNews(prev => prev ? {
         ...prev,
         comments_count: String(Number(prev.comments_count || 0) + 1),
@@ -114,11 +116,19 @@ export default function NewsDetailPage({ params }: NewsDetailPageProps) {
   };
 
   if (isLoading) {
-    return <div className="flex justify-center p-8">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen bg-white">
+        <div className="animate-spin rounded-full border-4 border-t-4 border-emerald-600 w-16 h-16"></div>
+      </div>
+    );
   }
 
   if (!news) {
-    return <div className="flex justify-center p-8">News not found</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-gray-500">News not found</p>
+      </div>
+    );
   }
 
   return (
@@ -134,7 +144,7 @@ export default function NewsDetailPage({ params }: NewsDetailPageProps) {
       <div className="mb-8">
         <NewsCard
           news={news}
-          onClick={() => {}} // Disable click since we're already on the detail page
+          onClick={() => {}}
           onLikeClick={() => news.is_liked_by_user ? handleUnlike() : handleLike()}
           isDetailView={true}
         />
@@ -144,9 +154,13 @@ export default function NewsDetailPage({ params }: NewsDetailPageProps) {
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold mb-4">Comments ({sortedComments.length})</h2>
 
-        {/* Comments List with Scroll (at the top) */}
+        {/* Comments List with Scroll */}
         <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin mb-6">
-          {sortedComments.length === 0 ? (
+          {isFetchingComments ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full border-2 border-t-2 border-emerald-600 w-6 h-6"></div>
+            </div>
+          ) : sortedComments.length === 0 ? (
             <p className="text-gray-500 text-center py-4">No comments yet</p>
           ) : (
             sortedComments.map(comment => (
@@ -175,7 +189,7 @@ export default function NewsDetailPage({ params }: NewsDetailPageProps) {
           <div ref={commentsEndRef} />
         </div>
 
-        {/* Comment Form (at the bottom) */}
+        {/* Comment Form */}
         <form onSubmit={handleCommentSubmit}>
           <div className="flex gap-2">
             <TextField
@@ -184,21 +198,23 @@ export default function NewsDetailPage({ params }: NewsDetailPageProps) {
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               disabled={isCommenting}
-              width="flex-1"  // Takes remaining space
-              height="h-12"   // Match button height
+              width="flex-1"
+              height="h-12"
             />
             <GradientButton
               type="submit"
-              width="w-12"    // Square button
-              height="h-12"   // Match input height
+              width="w-12"
+              height="h-12"
               disabled={!newComment.trim() || isCommenting}
             >
-              <Send size={20} className="text-white" />
+              {isCommenting ? (
+                <div className="animate-spin rounded-full border-2 border-t-2 border-white w-5 h-5"></div>
+              ) : (
+                <Send size={20} className="text-white" />
+              )}
             </GradientButton>
           </div>
         </form>
-
-
       </div>
     </div>
   );
