@@ -55,7 +55,6 @@ export default function AssignmentsPage({ params }: AssignmentPageProps) {
     router.push(
       `/workspace/${workspaceId}/assignments/${assignment.assignment_id}`
     );
-    console.log(assignment);
   };
 
   useEffect(() => {

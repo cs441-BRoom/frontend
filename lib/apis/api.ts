@@ -153,18 +153,20 @@ export const getAssignmentById = async (
 ): Promise<Assignment> => {
   try {
     const response = await axiosInstance.get(`assignments/${assignment_id}`);
-    return response.data.assignments;
+    return response.data.assignment;
   } catch (error) {
     console.error('Error get assignments:', error);
     throw error;
   }
 };
 
-export const getSummisionByAssignmentId = async (
+export const getAllSubmissionsByAssignmentId = async (
   assignment_id: number
 ): Promise<Submission[]> => {
   try {
-    const response = await axiosInstance.get(`${assignment_id}/submission`);
+    const response = await axiosInstance.get(
+      `/assignments/${assignment_id}/submissions`
+    );
     return response.data.assignments;
   } catch (error) {
     console.error('Error get submissions:', error);
