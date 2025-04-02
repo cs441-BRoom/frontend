@@ -10,6 +10,8 @@
 !.yarn/releases
 !.yarn/versions
 
+# ide
+.idea/*
 # testing
 /coverage
 
@@ -40,3 +42,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/.fleet
+/.idea
+/.nova
+/.vscode
+/.zed
