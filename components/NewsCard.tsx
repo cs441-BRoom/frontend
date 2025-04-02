@@ -13,7 +13,7 @@ interface NewsProps {
 export default function NewsCard({ news, onClick, onLikeClick }: NewsProps) {
   return (
     <div
-      className="mx-auto w-[50%] rounded-lg bg-white p-4 shadow-md"
+      className="mx-auto w-[50%] rounded-lg bg-white p-4 shadow-md cursor-pointer"
       onClick={() => onClick(news.news_id)}
     >
       <div className="mb-3 flex items-center">
@@ -26,6 +26,23 @@ export default function NewsCard({ news, onClick, onLikeClick }: NewsProps) {
 
       <h3 className="text-lg font-semibold text-gray-800">{news.title}</h3>
       <p className="mb-3 text-sm text-gray-700">{news.content}</p>
+
+      {/* Display images if available */}
+      {news.files && news.files.length > 0 && (
+        <div className="mb-4">
+          <div className="grid grid-cols-3 gap-2">
+            {news.files.map((file, index) => (
+              <div key={index} className="relative aspect-square overflow-hidden rounded-lg">
+                <img
+                  src={`data:${file.mime_type};base64,${file.base64}`}
+                  alt={`Image ${index + 1}`}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <hr className="my-2" />
       <div className="mt-3 flex items-center justify-between text-sm text-gray-500">

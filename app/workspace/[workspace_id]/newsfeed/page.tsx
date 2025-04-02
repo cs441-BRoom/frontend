@@ -1,22 +1,18 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { use, useEffect, useState } from 'react';
-import { useWorkspace } from '@/lib/context/WorkspaceContext';
-import { getNewsByWorkspaceId, likeNews, unlikeNews, createNews } from '@/lib/apis/api'; // import createNews
+import { getNewsByWorkspaceId, likeNews, unlikeNews, createNewsWithFiles } from '@/lib/apis/api';
 import { News } from '@/types/news';
 import NewsCard from '@/components/NewsCard';
-import { Image, XIcon, Heart } from 'lucide-react';
+import { Image, XIcon } from 'lucide-react';
 import GradientButton from '@/components/gradeint-button';
 import Modal from '@/components/modal';
-import { useAuth } from '@/lib/context/AuthContext';
 
 interface NewsfeedPageProps {
   params: Promise<{ workspace_id: string }>;
 }
 
 export default function NewsFeedPage({ params }: NewsfeedPageProps) {
-  const { selectedWorkspace } = useWorkspace();
-  const { user } = useAuth();
   const unwrappedParams = use(params);
   const workspaceId = Number(unwrappedParams.workspace_id);
   const [news, setNews] = useState<News[]>([]);
@@ -25,29 +21,33 @@ export default function NewsFeedPage({ params }: NewsfeedPageProps) {
   const [description, setDescription] = useState('');
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
   const router = useRouter();
 
+  const loadNews = async () => {
+    try {
+      const data = await getNewsByWorkspaceId(workspaceId);
+      // Filter out invalid items (undefined, null)
+      const validNews = data.filter((item) => item !== undefined && item !== null);
+      setNews(validNews); // Set only valid news items
+    } catch (error) {
+      console.error('Error fetching news:', error);
+    }
+  };
+
   useEffect(() => {
-    const loadNews = async () => {
-      try {
-        const data = await getNewsByWorkspaceId(workspaceId);
-
-        // Filter out invalid items (undefined, null)
-        const validNews = data.filter((item) => item !== undefined && item !== null);
-
-        setNews(validNews);  // Set only valid news items
-      } catch (error) {
-        console.error('Error fetching news:', error);
-      }
-    };
-
     loadNews();
   }, [workspaceId]);
-
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const selectedFiles = Array.from(event.target.files);
+      // Limit to maximum 3 images total
+      const totalFiles = files.length + selectedFiles.length;
+      if (totalFiles > 3) {
+        alert('You can only upload up to 3 images.');
+        return;
+      }
       const newPreviews = selectedFiles.map((file) => URL.createObjectURL(file));
       setFiles((prev) => [...prev, ...selectedFiles]);
       setPreviews((prev) => [...prev, ...newPreviews]);
@@ -56,7 +56,11 @@ export default function NewsFeedPage({ params }: NewsfeedPageProps) {
 
   const removeImage = (index: number) => {
     setFiles((prev) => prev.filter((_, i) => i !== index));
-    setPreviews((prev) => prev.filter((_, i) => i !== index));
+    setPreviews((prev) => {
+      // Revoke the object URL to avoid memory leaks
+      URL.revokeObjectURL(prev[index]);
+      return prev.filter((_, i) => i !== index);
+    });
   };
 
   const handleUpload = async () => {
@@ -65,24 +69,41 @@ export default function NewsFeedPage({ params }: NewsfeedPageProps) {
       return;
     }
 
-    // Create a news object
-    const newNews = {
-      workspace_id: workspaceId,
-      title,
-      content: description,
-    };
-
     try {
-      // Send request to create news
-      const createdNews = await createNews(newNews);
-      setNews((prevNews) => [createdNews, ...prevNews]); // Add the new news to the front of the list
-      setTitle(''); // Reset title
-      setDescription(''); // Reset description
-      setFiles([]); // Reset files
-      setPreviews([]); // Reset file previews
-      setIsModalOpen(false); // Close modal
+      setIsUploading(true);
+
+      // Create FormData for multipart/form-data request
+      const formData = new FormData();
+      formData.append('workspace_id', workspaceId.toString());
+      formData.append('title', title);
+      formData.append('content', description);
+
+      // Append each file to the FormData
+      files.forEach((file, index) => {
+        formData.append(`files[${index}]`, file);
+      });
+
+      // Send request to create news with files
+      await createNewsWithFiles(formData);
+
+      // Clear form
+      setTitle('');
+      setDescription('');
+      setFiles([]);
+
+      // Revoke all object URLs to avoid memory leaks
+      previews.forEach(URL.revokeObjectURL);
+      setPreviews([]);
+
+      // Close modal
+      setIsModalOpen(false);
+
+      // Reload all news to get the fresh data including images
+      await loadNews();
     } catch (error) {
       console.error('Error creating news:', error);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -95,14 +116,13 @@ export default function NewsFeedPage({ params }: NewsfeedPageProps) {
       prevNews.map((item) =>
         item.news_id === news_id
           ? {
-            ...item,
-            is_liked_by_user: true,
-            like_count: String(Number(item.like_count || 0) + 1), // Convert to number, increment, then back to string
-          }
-          : item,
-      ),
+              ...item,
+              is_liked_by_user: true,
+              like_count: String(Number(item.like_count || 0) + 1),
+            }
+          : item
+      )
     );
-
     try {
       await likeNews(news_id);
     } catch (error) {
@@ -111,12 +131,12 @@ export default function NewsFeedPage({ params }: NewsfeedPageProps) {
         prevNews.map((item) =>
           item.news_id === news_id
             ? {
-              ...item,
-              is_liked_by_user: false,
-              like_count: String(Math.max(Number(item.like_count || 1) - 1, 0)),
-            }
-            : item,
-        ),
+                ...item,
+                is_liked_by_user: false,
+                like_count: String(Math.max(Number(item.like_count || 1) - 1, 0)),
+              }
+            : item
+        )
       );
     }
   };
@@ -126,14 +146,13 @@ export default function NewsFeedPage({ params }: NewsfeedPageProps) {
       prevNews.map((item) =>
         item.news_id === news_id
           ? {
-            ...item,
-            is_liked_by_user: false,
-            like_count: String(Math.max(Number(item.like_count || 1) - 1, 0)),
-          }
-          : item,
-      ),
+              ...item,
+              is_liked_by_user: false,
+              like_count: String(Math.max(Number(item.like_count || 1) - 1, 0)),
+            }
+          : item
+      )
     );
-
     try {
       await unlikeNews(news_id);
     } catch (error) {
@@ -142,22 +161,26 @@ export default function NewsFeedPage({ params }: NewsfeedPageProps) {
         prevNews.map((item) =>
           item.news_id === news_id
             ? {
-              ...item,
-              is_liked_by_user: true,
-              like_count: String(Number(item.like_count || 0) + 1),
-            }
-            : item,
-        ),
+                ...item,
+                is_liked_by_user: true,
+                like_count: String(Number(item.like_count || 0) + 1),
+              }
+            : item
+        )
       );
     }
   };
 
   const closeModal = () => {
-    setTitle(''); // รีเซ็ต title
-    setDescription(''); // รีเซ็ต description
-    setFiles([]); // รีเซ็ต files
-    setPreviews([]); // รีเซ็ต previews
-    setIsModalOpen(false); // ปิด Modal
+    setTitle('');
+    setDescription('');
+
+    // Revoke all object URLs to avoid memory leaks
+    previews.forEach(URL.revokeObjectURL);
+    setFiles([]);
+    setPreviews([]);
+
+    setIsModalOpen(false);
   };
 
   return (
@@ -167,35 +190,30 @@ export default function NewsFeedPage({ params }: NewsfeedPageProps) {
           <div className="flex flex-row justify-end">
             <GradientButton text="Post" width="w-40" onClick={openModal} />
           </div>
-
           <div className="flex flex-col gap-6">
             {news && news.length > 0 ? (
               news.map((item) => {
                 if (!item) {
                   console.error('Invalid news item:', item);
-                  return null;  // ข้าม item ที่ไม่ถูกต้อง
+                  return null;
                 }
-
                 return (
                   <NewsCard
                     key={item.news_id}
                     news={item}
                     onClick={(news_id) => router.push(`/workspace/${workspaceId}/newsfeed/${news_id}`)}
                     onLikeClick={() =>
-                      item.is_liked_by_user
-                        ? handleUnlike(item.news_id)
-                        : handleLike(item.news_id)
+                      item.is_liked_by_user ? handleUnlike(item.news_id) : handleLike(item.news_id)
                     }
                   />
                 );
               })
             ) : (
-              <p>No news available.</p>  // หรือสามารถแสดงข้อความว่าข่าวไม่มี
+              <p>No news available.</p>
             )}
           </div>
         </div>
       </div>
-
       <Modal isOpen={isModalOpen} onClose={closeModal}>
         <div className="flex w-full items-center justify-between text-gray-800">
           <h2 className="flex-grow text-center text-2xl text-gray-800">Create Post</h2>
@@ -213,7 +231,6 @@ export default function NewsFeedPage({ params }: NewsfeedPageProps) {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
-
         <div className="mt-4 grid grid-cols-3 gap-2">
           {previews.map((preview, index) => (
             <div key={index} className="relative h-24 w-24">
@@ -223,28 +240,40 @@ export default function NewsFeedPage({ params }: NewsfeedPageProps) {
                 className="h-full w-full rounded-lg object-cover"
               />
               <button
-                onClick={() => removeImage(index)}
-                className="absolute top-1 right-1 rounded-full p-1 text-xs text-white"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeImage(index);
+                }}
+                className="absolute top-1 right-1 rounded-full bg-gray-700 p-1 text-xs text-white"
               >
-                <XIcon />
+                <XIcon size={16} />
               </button>
             </div>
           ))}
         </div>
-
-        <div className="flex cursor-pointer flex-row gap-2 text-gray-600">
-          <Image />
-          <label htmlFor="file-upload" className="cursor-pointer">Upload your image</label>
+        <div className="mt-4 flex cursor-pointer flex-row gap-2 text-gray-600 items-center">
+          <Image size={20} />
+          <label htmlFor="file-upload" className={`cursor-pointer ${isUploading ? 'opacity-50' : ''}`}>
+            Upload your image
+          </label>
           <input
             id="file-upload"
             type="file"
+            multiple
+            accept="image/*"
             className="hidden"
             onChange={handleFileChange}
+            disabled={isUploading}
           />
           <p className="text-gray-800">{files.length}/3</p>
         </div>
-
-        <GradientButton text="Post" onClick={handleUpload} />
+        <div className="mt-4">
+          <GradientButton
+            text={isUploading ? "Posting..." : "Post"}
+            onClick={handleUpload}
+            disabled={isUploading}
+          />
+        </div>
       </Modal>
     </div>
   );

@@ -1,19 +1,19 @@
-'use client'
+'use client';
 
-import {useSearchParams} from "next/navigation";
-import {useState, useEffect} from "react";
-import WorkspaceCard from "@/components/WorkspaceCard";
-import {Workspace} from "@/types/workspace";
-import {fetchJoinWorkspaces, fetchMyWorkspaces, createWorkspace, joinWorkspace} from "@/lib/apis/api"; // เพิ่มฟังก์ชัน joinWorkspace
-import {useRouter} from "next/navigation";
-import Modal from "@/components/modal";
-import GradientButton from "@/components/gradeint-button";
+import { useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import WorkspaceCard from '@/components/WorkspaceCard';
+import { Workspace } from '@/types/workspace';
+import { fetchJoinWorkspaces, fetchMyWorkspaces, createWorkspace, joinWorkspace } from '@/lib/apis/api'; // เพิ่มฟังก์ชัน joinWorkspace
+import { useRouter } from 'next/navigation';
+import Modal from '@/components/modal';
+import GradientButton from '@/components/gradeint-button';
 import { useWorkspace } from '@/lib/context/WorkspaceContext';
 import { useAuth } from '@/lib/context/AuthContext';
 
 export default function WorkspacePage() {
   const searchParams = useSearchParams();
-  const showOwned = searchParams.get("owner") === "true"; // ถ้า true แสดง workspace ที่เราสร้าง
+  const showOwned = searchParams.get('owner') === 'true'; // ถ้า true แสดง workspace ที่เราสร้าง
 
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -23,7 +23,7 @@ export default function WorkspacePage() {
   const [description, setDescription] = useState('');
   const [joinCode, setJoinCode] = useState(''); // State สำหรับเก็บ join_code
   const [joinError, setJoinError] = useState(''); // State สำหรับเก็บข้อความ error เมื่อ join ล้มเหลว
-  const {setSelectedWorkspace} = useWorkspace(); // ดึงฟังก์ชันจาก context
+  const { setSelectedWorkspace } = useWorkspace(); // ดึงฟังก์ชันจาก context
   const router = useRouter();
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function WorkspacePage() {
 
         setWorkspaces(workspacesData);
       } catch (error) {
-        console.error("Error fetching workspaces:", error);
+        console.error('Error fetching workspaces:', error);
       } finally {
         setLoading(false);
       }
@@ -60,19 +60,19 @@ export default function WorkspacePage() {
     }
 
     try {
-      const createdWorkspace = await createWorkspace({name: title, description});
+      const createdWorkspace = await createWorkspace({ name: title, description });
 
       if (showOwned) {
         setWorkspaces(prevWorkspaces => [...prevWorkspaces, createdWorkspace]);
       } else {
-        router.replace("/workspace?owner=true");
+        router.replace('/workspace?owner=true');
       }
 
       setTitle('');
       setDescription('');
       closeModal();
     } catch (error) {
-      console.error("Error creating workspace:", error);
+      console.error('Error creating workspace:', error);
       alert('Failed to create workspace');
     }
   };
@@ -84,12 +84,12 @@ export default function WorkspacePage() {
     }
 
     try {
-      const joinedWorkspace = await joinWorkspace({join_code: joinCode}); // เรียกฟังก์ชัน joinWorkspace
+      const joinedWorkspace = await joinWorkspace({ join_code: joinCode }); // เรียกฟังก์ชัน joinWorkspace
 
       if (!showOwned) {
         setWorkspaces(prevWorkspaces => [...prevWorkspaces, joinedWorkspace]); // เพิ่ม workspace ที่เข้าร่วม
       } else {
-        router.replace("/workspace?owner=false");
+        router.replace('/workspace?owner=false');
       }
       setJoinCode(''); // รีเซ็ตค่า join code
       setJoinError(''); // รีเซ็ตข้อความ error
@@ -137,7 +137,7 @@ export default function WorkspacePage() {
       </div>
 
       <h1 className="text-2xl font-bold my-4 text-black">
-        {showOwned ? "My Workspaces" : "Joined Workspaces"}
+        {showOwned ? 'My Workspaces' : 'Joined Workspaces'}
       </h1>
 
       <div className="grid grid-cols-3 gap-8 overflow-auto py-6">
@@ -154,7 +154,7 @@ export default function WorkspacePage() {
             />
           ))
         ) : (
-          <p className="text-gray-500">No workspace at {showOwned ? "You created" : "You joined"} 😢</p>
+          <p className="text-gray-500">No workspace at {showOwned ? 'You created' : 'You joined'} 😢</p>
         )}
       </div>
 
