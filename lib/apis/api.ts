@@ -183,7 +183,7 @@ export const getAssignmentById = async (
 ): Promise<Assignment> => {
   try {
     const response = await axiosInstance.get(`assignments/${assignment_id}`);
-    return response.data.assignment;
+    return response.data;
   } catch (error) {
     console.error('Error get assignments:', error);
     throw error;

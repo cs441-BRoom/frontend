@@ -177,7 +177,7 @@ export default function AssignmentsubmissionDetailPage({
                   </div>
                   <button
                     className={`h-12 w-32 rounded-md p-3 text-lg text-white ${
-                      assignment?.score === 0
+                      assignment?.score === 0 && status.text === 'Submitted'
                         ? 'cursor-pointer bg-green-500'
                         : 'cursor-not-allowed bg-gray-300'
                     }`}
@@ -196,9 +196,9 @@ export default function AssignmentsubmissionDetailPage({
                 <p className='text-gray-800'>{assignment?.description}</p>
               </div>
               <div>
-                <p className='text-jg w-40 text-gray-700'>
+                <div className='text-jg w-40 text-gray-700'>
                   <div>
-                    {assignment?.score === 0 ? (
+                    {assignment?.score === 0 && status.text === 'Submitted' ? (
                       <div>
                         <input
                           type='text'
@@ -212,7 +212,7 @@ export default function AssignmentsubmissionDetailPage({
                       <span></span>
                     )}
                   </div>
-                </p>
+                </div>
               </div>
             </div>
             <div className='flex flex-row gap-2'>

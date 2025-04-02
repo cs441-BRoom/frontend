@@ -19,15 +19,10 @@ interface AssignmentDetailPageProps {
   params: Promise<{ workspace_id: string; assignment_id: number }>;
 }
 
-interface ImageFile {
-  file: File;
-  preview: string;
-}
-
 interface AssignmentImage {
-  id: number;
   name: string;
-  preview: string;
+  base64: string;
+  mime_type: string;
 }
 
 export default function AssignmentDetailPage({
@@ -41,7 +36,6 @@ export default function AssignmentDetailPage({
   const [showOwned, setShowOwned] = useState<boolean>(false);
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
-  const [submittedImages, setSubmittedImages] = useState<ImageFile[]>([]);
   const [assignmentImages, setAssignmentImages] = useState<AssignmentImage[]>(
     []
   );
@@ -55,16 +49,25 @@ export default function AssignmentDetailPage({
   const router = useRouter();
 
   useEffect(() => {
+    if (selectedWorkspace?.created_by === user?.user_id) {
+      setShowOwned(true);
+    }
+  }, [selectedWorkspace, user]);
+
+  useEffect(() => {
     const loadAssignment = async () => {
       try {
         const assignment = await getAssignmentById(assignmentId);
         setAssignment(assignment);
+        setAssignmentImages(assignment.files);
 
         const submissions = await getAllSubmissionsByAssignmentId(assignmentId);
         setSubmissions(submissions);
 
-        const my_submission = await getMySubmission(assignmentId);
-        setMySubmission(my_submission);
+        if (selectedWorkspace?.created_by !== user?.user_id) {
+          const my_submission = await getMySubmission(assignmentId);
+          setMySubmission(my_submission);
+        }
       } catch (error) {
         console.error('Error fetching assignment:', error);
       }
@@ -124,12 +127,6 @@ export default function AssignmentDetailPage({
   const closeAssignmentView = () => {
     setSelectedAssignment(null);
   };
-
-  useEffect(() => {
-    if (selectedWorkspace?.created_by === user?.user_id) {
-      setShowOwned(true);
-    }
-  }, [selectedWorkspace, user]);
 
   const determineStatus = () => {
     const now = new Date();
@@ -247,16 +244,16 @@ export default function AssignmentDetailPage({
                 </div>
               </div>
               <div className='flex flex-row gap-2'>
-                {assignmentImages.map((assignment) => (
+                {assignmentImages.map((assignment, index) => (
                   <div
-                    key={assignment.id}
+                    key={assignment.name}
                     onClick={() => openAssignmentImage(assignment)}
                     className='cursor-pointer overflow-hidden rounded-lg border transition-shadow hover:shadow-lg'
                   >
                     <div className='relative'>
                       <img
-                        src={assignment.preview}
-                        alt={assignment.name}
+                        src={`data:${assignment.mime_type};base64,${assignment.base64}`}
+                        alt={`Image ${index + 1}`}
                         className='h-32 w-48 object-cover'
                       />
                       <div className='bg-opacity-50 absolute right-0 bottom-0 left-0 flex items-center bg-black p-2 text-white'>
@@ -269,35 +266,6 @@ export default function AssignmentDetailPage({
               </div>
 
               <hr className='my-4' />
-              {assignment?.files && assignment.files.length > 0 && (
-                <div className='mt-4'>
-                  <div
-                    className={`grid ${assignment.files.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-4`}
-                  >
-                    {assignment.files.map((imageUrl, index) => (
-                      <div
-                        key={index}
-                        className='overflow-hidden rounded-lg bg-white shadow-md'
-                      >
-                        <div className='relative'>
-                          <img
-                            src={imageUrl}
-                            alt={`Assignment image ${index + 1}`}
-                            className='h-32 w-[50%] object-cover'
-                          />
-                          <div className='bg-opacity-50 absolute right-0 bottom-0 left-0 flex items-center justify-between bg-black p-2 text-white'>
-                            <div className='flex items-center'>
-                              <FileText className='mr-2' size={16} />
-                              <span>Assignment Image {index + 1}</span>
-                            </div>
-                            <div className='flex items-center'></div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
               {previews.length > 0 && (
                 <div className='mt-4 grid grid-cols-3 gap-4'>
                   {previews.map((image, index) => (
@@ -344,16 +312,16 @@ export default function AssignmentDetailPage({
           {/* Show image form assignment */}
           {status.text === 'Pending' && assignmentImages.length > 0 && (
             <div className='flex flex-row gap-2'>
-              {assignmentImages.map((assignment) => (
+              {assignmentImages.map((assignment, index) => (
                 <div
-                  key={assignment.id}
+                  key={assignment.name}
                   onClick={() => openAssignmentImage(assignment)}
                   className='cursor-pointer overflow-hidden rounded-lg border transition-shadow hover:shadow-lg'
                 >
                   <div className='relative'>
                     <img
-                      src={assignment.preview}
-                      alt={assignment.name}
+                      src={`data:${assignment.mime_type};base64,${assignment.base64}`}
+                      alt={`Image ${index + 1}`}
                       className='h-32 w-48 object-cover'
                     />
                     <div className='bg-opacity-50 absolute right-0 bottom-0 left-0 flex items-center bg-black p-2 text-white'>
@@ -392,24 +360,6 @@ export default function AssignmentDetailPage({
             </div>
           )}
         </div>
-
-        {selectedAssignment && (
-          <div className='bg-opacity-80 fixed inset-0 z-50 flex items-center justify-center bg-black p-4'>
-            <div className='relative max-h-full max-w-4xl'>
-              <button
-                onClick={closeAssignmentView}
-                className='absolute -top-10 right-0 rounded-full p-2 text-white hover:bg-red-500'
-              >
-                <X size={24} />
-              </button>
-              <img
-                src={selectedAssignment.preview}
-                alt={selectedAssignment.name}
-                className='max-h-screen max-w-full object-contain'
-              />
-            </div>
-          </div>
-        )}
       </div>
     );
   }
