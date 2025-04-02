@@ -45,7 +45,7 @@ export default function Sidebar({ children }: SidebarProps) {
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <div className="w-64 border-r bg-white px-4 py-6">
+      <div className="w-64 border-r border-gray-300 bg-white px-4 py-6">
         <h2 className="mb-6 text-xl font-semibold text-gray-800">Menu</h2>
         <nav>
           {menuItems.map((item) => (

@@ -10,7 +10,7 @@ function Modal({ isOpen, onClose, children }: ModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className='z-50'
+    <div className='z-50 '
       style={{
         position: 'fixed',
         top: '0',

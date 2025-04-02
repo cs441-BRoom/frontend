@@ -6,13 +6,13 @@ import {
 } from '@/types/workspace';
 import axiosInstance from '@/lib/apis/axios';
 import { CreateNews, News } from '@/types/news';
+import { Comment } from '@/types/comment';
 import { Like } from '@/types/like';
 import {
   Assignment,
   CreateAssignment,
   SubmitAssignment,
 } from '@/types/assignment';
-import axios from 'axios';
 import { Submission } from '@/types/submission';
 
 // Auth API
@@ -80,6 +80,16 @@ export const getNewsByWorkspaceId = async (
   workspace_id: number
 ): Promise<News[]> => {
   const response = await axiosInstance.get(`/workspaces/${workspace_id}/news`);
+  return response.data.news;
+};
+
+export const getNewsById = async (
+  news_id: number,
+  workspace_id: number
+): Promise<News> => {
+  const response = await axiosInstance.get(
+    `/workspaces/${workspace_id}/news/${news_id}`
+  );
   return response.data.news;
 };
 
@@ -229,4 +239,21 @@ export const getMySubmission = async (
     console.error('Error get submissions:', error);
     throw error;
   }
+};
+export const getCommentsByNewsId = async (
+  newsId: number
+): Promise<Comment[]> => {
+  const response = await axiosInstance.get(`/news/${newsId}/comments`);
+  return response.data.comments;
+};
+
+export const createComment = async (
+  newsId: number,
+  content: string
+): Promise<Comment> => {
+  const response = await axiosInstance.post('/comments', {
+    news_id: newsId,
+    content,
+  });
+  return response.data.comment;
 };

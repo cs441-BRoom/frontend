@@ -1,30 +1,30 @@
-import React from 'react';
-
 interface GradientButtonProps {
   onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
   width?: string;
   height?: string;
-  type?: 'button' | 'submit' | 'reset';  // รองรับ type ของปุ่ม
-  text: string;
+  type?: 'button' | 'submit' | 'reset';
+  text?: string;  // Make optional if using children
   disabled?: boolean;
+  children?: React.ReactNode;  // Add children prop
 }
 
 export default function GradientButton({
-                                         onClick,
-                                         height = 'h-10',
-                                         width = 'w-full',
-                                         type = 'button',  // ค่าเริ่มต้นเป็น 'button'
-                                         disabled,
-                                         text,
-                                       }: GradientButtonProps) {
+  onClick,
+  height = 'h-10',
+  width = 'w-full',
+  type = 'button',
+  disabled,
+  text,
+  children,  // Add children
+}: GradientButtonProps) {
   return (
     <button
-      type={type}  // ใช้ type ที่ระบุใน props
+      type={type}
       className={`${width} ${height} flex cursor-pointer items-center justify-center rounded-md bg-gradient-to-r from-[#2596be] via-[#1c9e56] to-[#3fa191]`}
-      onClick={onClick}  // การจัดการ click ตามประเภทปุ่ม
-      disabled={disabled}  // ปิดการใช้งานปุ่มถ้า disabled
+      onClick={onClick}
+      disabled={disabled}
     >
-      <span className='font-thin text-white'>{text}</span>
+      {children || <span className='font-thin text-white'>{text}</span>}
     </button>
   );
 }
