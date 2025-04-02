@@ -78,11 +78,7 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
         setIsAuthenticated,
       }}
     >
-      {loading ? (
-        <div>Loading...</div>
-      ) : (
-        children
-      )}
+      {children}
     </AuthContext.Provider>
   );
 };

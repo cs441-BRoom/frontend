@@ -5,10 +5,10 @@ import {useState, useEffect} from "react";
 import WorkspaceCard from "@/components/WorkspaceCard";
 import {Workspace} from "@/types/workspace";
 import {fetchJoinWorkspaces, fetchMyWorkspaces, createWorkspace, joinWorkspace} from "@/lib/apis/api"; // เพิ่มฟังก์ชัน joinWorkspace
-import {useWorkspace} from "@/lib/context/WorkspaceContext";
 import {useRouter} from "next/navigation";
 import Modal from "@/components/modal";
 import GradientButton from "@/components/gradeint-button";
+import { useWorkspace } from '@/lib/context/WorkspaceContext';
 
 export default function WorkspacePage() {
   const searchParams = useSearchParams();
@@ -50,7 +50,7 @@ export default function WorkspacePage() {
 
   const handleCardClick = (workspace: Workspace) => {
     setSelectedWorkspace(workspace);
-    router.push(`/workspace/${workspace.workspace_id}`);
+    router.push(`/workspace/${workspace.workspace_id}/newsfeed`);
   };
 
   const handleCreateWorkspace = async () => {

@@ -48,18 +48,9 @@ export function useAuthActions() {
 
     try {
       const data = await register(userData);
-      // เก็บ token และข้อมูลผู้ใช้
-      const token = data.token;
-      const user = data.user;
 
-      // เก็บข้อมูลใน localStorage
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-
-      setUser(user);
-      setIsAuthenticated(true);
-      router.push('/workspace');
-      return user;
+      router.push('/auth/login');
+      return ;
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError('There was an error while registering. Please try again.');

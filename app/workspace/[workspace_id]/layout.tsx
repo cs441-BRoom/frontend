@@ -9,6 +9,7 @@ interface WorkspaceLayoutProps {
 }
 
 export default function WorkspaceDetailLayout({ children }: WorkspaceLayoutProps) {
+
   return (
     <div className="flex">
       {/* Sidebar */}
