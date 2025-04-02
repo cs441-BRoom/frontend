@@ -1,16 +1,26 @@
 import { AuthResponse, LoginCredentials, RegisterData } from '@/types/auth';
-import { CreateWorkspaceData, JoinWorkspace, Workspace } from '@/types/workspace';
+import {
+  CreateWorkspaceData,
+  JoinWorkspace,
+  Workspace,
+} from '@/types/workspace';
 import axiosInstance from '@/lib/apis/axios';
 import { CreateNews, News } from '@/types/news';
 import { Like } from '@/types/like';
+import { Assignment, CreateAssignment } from '@/types/assignment';
+import axios from 'axios';
 
 // Auth API
-export const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
+export const login = async (
+  credentials: LoginCredentials
+): Promise<AuthResponse> => {
   const response = await axiosInstance.post('/auth/login', credentials);
   return response.data;
 };
 
-export const register = async (userData: RegisterData): Promise<AuthResponse> => {
+export const register = async (
+  userData: RegisterData
+): Promise<AuthResponse> => {
   const response = await axiosInstance.post('/auth/register', userData);
   return response.data;
 };
@@ -30,12 +40,16 @@ export const fetchMyWorkspaces = async (): Promise<Workspace[]> => {
   return response.data.workspaces; // ดึงข้อมูลที่อยู่ใน `workspaces`
 };
 
-export const fetchWorkspaceById = async (workspace_id: number): Promise<Workspace> => {
+export const fetchWorkspaceById = async (
+  workspace_id: number
+): Promise<Workspace> => {
   const response = await axiosInstance.get(`/workspaces/${workspace_id}`);
   return response.data.workspace;
 };
 
-export const createWorkspace = async (data: CreateWorkspaceData): Promise<Workspace> => {
+export const createWorkspace = async (
+  data: CreateWorkspaceData
+): Promise<Workspace> => {
   try {
     const response = await axiosInstance.post('/workspaces', data);
     return response.data.workspace;
@@ -45,7 +59,9 @@ export const createWorkspace = async (data: CreateWorkspaceData): Promise<Worksp
   }
 };
 
-export const joinWorkspace = async (data: JoinWorkspace): Promise<Workspace> => {
+export const joinWorkspace = async (
+  data: JoinWorkspace
+): Promise<Workspace> => {
   try {
     const response = await axiosInstance.post('/workspaces/join', data);
     return response.data.workspace;
@@ -55,7 +71,9 @@ export const joinWorkspace = async (data: JoinWorkspace): Promise<Workspace> => 
   }
 };
 
-export const getNewsByWorkspaceId = async (workspace_id: number): Promise<News[]> => {
+export const getNewsByWorkspaceId = async (
+  workspace_id: number
+): Promise<News[]> => {
   const response = await axiosInstance.get(`/workspaces/${workspace_id}/news`);
   return response.data.news;
 };
@@ -90,6 +108,42 @@ export const createNews = async (news: CreateNews): Promise<News> => {
   }
 };
 
+export const getAllAssignmentByWorkspaceId = async (
+  workspaceId: number
+): Promise<Assignment[]> => {
+  try {
+    const response = await axiosInstance.get(
+      `workspaces/${workspaceId}/assignments`
+    );
+    return response.data.assignments;
+  } catch (error) {
+    console.error('Error get assignments:', error);
+    throw error;
+  }
+};
 
+export const createAssignment = async (
+  assignment: CreateAssignment
+): Promise<Assignment> => {
+  try {
+    const formData = new FormData();
+    formData.append('workspace_id', assignment.workspace_id.toString());
+    formData.append('title', assignment.title);
+    formData.append('description', assignment.description);
+    formData.append('due_date', assignment.due_date);
 
+    assignment.files.forEach((file) => {
+      formData.append('files', file);
+    });
 
+    const response = await axiosInstance.post('/assignments', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data.assignments;
+  } catch (error) {
+    console.error('Error creating assignment:', error);
+    throw error; // ข้อผิดพลาดที่เกิดขึ้นจะถูกโยนออกไป
+  }
+};
