@@ -3,16 +3,16 @@ import { format, parseISO, isAfter } from 'date-fns';
 
 interface AssignmentSubmissionCardProps {
   submissionId: number;
-  username: string;
+  username: number;
   dueDate: string;
-  assignmentId: string;
+  assignmentId: number;
   workspaceId: number;
   submissionDate?: string;
   onClick: (submissionId: number) => void;
 }
 
 export default function AssignmentSubmissionCard({
-    submissionId,
+  submissionId,
   dueDate,
   username,
   submissionDate,

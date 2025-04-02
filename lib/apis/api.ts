@@ -13,7 +13,7 @@ import {
   CreateAssignment,
   SubmitAssignment,
 } from '@/types/assignment';
-import { Submission } from '@/types/submission';
+import { Submission, UpdateScore } from '@/types/submission';
 
 // Auth API
 export const login = async (
@@ -190,6 +190,17 @@ export const getAssignmentById = async (
   }
 };
 
+export const getSubmissionById = async (
+  submission_id: number
+): Promise<Submission> => {
+  try {
+    const response = await axiosInstance.get(`submissions/${submission_id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error get assignments:', error);
+    throw error;
+  }
+};
 export const getAllSubmissionsByAssignmentId = async (
   assignment_id: number
 ): Promise<Submission[]> => {
@@ -256,4 +267,14 @@ export const createComment = async (
     content,
   });
   return response.data.comment;
+};
+
+export const updateScore = async (data: UpdateScore): Promise<Submission> => {
+  try {
+    const response = await axiosInstance.post(`/submissions`, data);
+    return response.data;
+  } catch (error) {
+    console.error('Error get submissions:', error);
+    throw error;
+  }
 };

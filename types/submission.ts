@@ -1,11 +1,11 @@
 export interface Submission {
-  submission_id: string;
+  submission_id: number;
 
-  assignment_id: string;
+  assignment_id: number;
 
-  user_id: string;
+  user_id: number;
 
-  score: string;
+  score: number;
 
   submit_at: string;
 
@@ -20,14 +20,7 @@ export interface SubmissionFile {
   mime_type: string;
 }
 
-export interface CreateSubmission {
-  submission_id: string;
-
-  assignment_id: string;
-
-  user_id: string;
-
-  score: string;
-
-  submit_at: string;
+export interface UpdateScore {
+  submission_id: number;
+  score: number;
 }

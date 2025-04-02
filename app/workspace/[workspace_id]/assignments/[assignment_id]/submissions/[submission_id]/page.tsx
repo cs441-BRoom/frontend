@@ -1,11 +1,16 @@
 'use client';
 import React, { use, useEffect, useState } from 'react';
 import { FileText, X } from 'lucide-react';
-import { isAfter, parseISO } from 'date-fns';
+import { isAfter, parseISO, sub } from 'date-fns';
 import { useAuth } from '@/lib/context/AuthContext';
-import { getAssignmentById } from '@/lib/apis/api';
+import {
+  getAssignmentById,
+  getSubmissionById,
+  updateScore,
+} from '@/lib/apis/api';
 import { Assignment } from '@/types/assignment';
 import { Submission } from '@/types/submission';
+import { useRouter } from 'next/navigation';
 
 interface ImageFile {
   file: File;
@@ -13,9 +18,9 @@ interface ImageFile {
 }
 
 interface AssignmentImage {
-  id: number;
   name: string;
-  preview: string;
+  base64: string;
+  mime_type: string;
 }
 
 interface AssignmentsubmissionDetailPageProps {
@@ -40,26 +45,29 @@ export default function AssignmentsubmissionDetailPage({
     []
   );
 
-  const [score, setScore] = useState('');
+  const [score, setScore] = useState<number>();
   const [assignment, setAssignment] = useState<Assignment>();
   const [submission, setSubmissions] = useState<Submission>();
 
-  const handleScore = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setScore(event.target.value);
+  const router = useRouter();
+
+  const handleScore = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setScore(Number(event.target.value));
+
+    await updateScore({
+      submission_id: submission_id,
+      score: score || 0,
+    });
+
+    router.push(`/workspace/${workspaceId}/assignments/${assignmentId}`);
   };
 
   const scoreHandle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setScore(e.target.value);
+    setScore(Number(e.target.value));
   };
 
   const [selectedAssignment, setSelectedAssignment] =
     useState<AssignmentImage | null>(null);
-
-  const removeImage = (indexToRemove: number) => {
-    setSelectedImages((prevImages) =>
-      prevImages.filter((_, index) => index !== indexToRemove)
-    );
-  };
 
   const openAssignmentImage = (assignment: AssignmentImage) => {
     setSelectedAssignment(assignment);
@@ -69,45 +77,17 @@ export default function AssignmentsubmissionDetailPage({
     setSelectedAssignment(null);
   };
 
-  const handleSubmit = () => {
-    if (selectedImages.length === 0) {
-      alert('Please select images to submit');
-      return;
-    }
-
-    setSubmittedImages((prev) => [...prev, ...selectedImages]);
-
-    selectedImages.forEach((imageFile) => {
-      const formData = new FormData();
-      formData.append('file', imageFile.file);
-
-      console.log('Submitting file:', imageFile.file.name);
-    });
-
-    // Clear selected images after submission
-    setSelectedImages([]);
-  };
-
-  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files) return;
-
-    const newImages: ImageFile[] = Array.from(files)
-      .filter((file) => file.type.startsWith('image/'))
-      .map((file) => ({
-        file,
-        preview: URL.createObjectURL(file),
-      }));
-
-    setSelectedImages((prevImages) => [...prevImages, ...newImages]);
-  };
-
   useEffect(() => {
     const loadAssignment = async () => {
       try {
         const assignment = await getAssignmentById(assignmentId);
         setAssignment(assignment);
-        console.log(submission);
+        setAssignmentImages(assignment.files);
+
+        const submission = await getSubmissionById(submission_id);
+        setSubmissions(submission);
+
+        console.log(assignment);
       } catch (error) {
         console.error('Error fetching assignment:', error);
       }
@@ -125,8 +105,8 @@ export default function AssignmentsubmissionDetailPage({
     const parsedDueDate = assignment?.due_date
       ? parseISO(assignment.due_date)
       : null;
-    const parsedSubmissionDate = assignment?.submission_date
-      ? parseISO(assignment.submission_date)
+    const parsedSubmissionDate = submission?.submit_at
+      ? parseISO(submission.submit_at)
       : null;
 
     if (parsedDueDate === null) {
@@ -182,7 +162,7 @@ export default function AssignmentsubmissionDetailPage({
                         : 'cursor-not-allowed bg-gray-300'
                     }`}
                     disabled={assignment?.score !== 0}
-                    onClick={assignment?.score === 0 ? handleScore : undefined} // ใช้ handleScore ถ้า score เป็น null
+                    onClick={submission?.score === 0 ? handleScore : undefined} // ใช้ handleScore ถ้า score เป็น null
                   >
                     {assignment?.score === 0 ? 'Submit' : 'Done'}{' '}
                     {/* ถ้า score เป็น null แสดง "Submit", ถ้ามีคะแนนแสดง "Done" */}
@@ -198,7 +178,7 @@ export default function AssignmentsubmissionDetailPage({
               <div>
                 <div className='text-jg w-40 text-gray-700'>
                   <div>
-                    {assignment?.score === 0 && status.text === 'Submitted' ? (
+                    {submission?.score === 0 && status.text === 'Submitted' ? (
                       <div>
                         <input
                           type='text'
@@ -216,16 +196,16 @@ export default function AssignmentsubmissionDetailPage({
               </div>
             </div>
             <div className='flex flex-row gap-2'>
-              {assignmentImages.map((assignment) => (
+              {assignmentImages.map((assignment, index) => (
                 <div
-                  key={assignment.id}
+                  key={assignment.name}
                   onClick={() => openAssignmentImage(assignment)}
                   className='cursor-pointer overflow-hidden rounded-lg border transition-shadow hover:shadow-lg'
                 >
                   <div className='relative'>
                     <img
-                      src={assignment.preview}
-                      alt={assignment.name}
+                      src={`data:${assignment.mime_type};base64,${assignment.base64}`}
+                      alt={`Image ${index + 1}`}
                       className='h-32 w-48 object-cover'
                     />
                     <div className='bg-opacity-50 absolute right-0 bottom-0 left-0 flex items-center bg-black p-2 text-white'>
@@ -238,75 +218,25 @@ export default function AssignmentsubmissionDetailPage({
             </div>
 
             <hr className='my-4' />
-            {assignment?.files && assignment.files.length > 0 && (
-              <div className='mt-4'>
-                <div
-                  className={`grid ${assignment.files.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-4`}
-                >
-                  {assignment.files.map((imageUrl, index) => (
-                    <div
-                      key={index}
-                      className='overflow-hidden rounded-lg bg-white shadow-md'
-                    >
-                      <div className='relative'>
-                        <img
-                          src={imageUrl}
-                          alt={`Assignment image ${index + 1}`}
-                          className='h-32 w-[50%] object-cover'
-                        />
-                        <div className='bg-opacity-50 absolute right-0 bottom-0 left-0 flex items-center justify-between bg-black p-2 text-white'>
-                          <div className='flex items-center'>
-                            <FileText className='mr-2' size={16} />
-                            <span>Assignment Image {index + 1}</span>
-                          </div>
-                          <div className='flex items-center'></div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {selectedImages.length > 0 && (
-              <div className='mt-4 grid grid-cols-3 gap-4'>
-                {selectedImages.map((image, index) => (
-                  <div key={index} className='group relative'>
-                    <img
-                      src={image.preview}
-                      alt={`Selected ${index}`}
-                      className='h-50 w-full rounded-lg object-cover'
-                    />
-                    <button
-                      onClick={() => removeImage(index)}
-                      className='absolute top-2 right-2 rounded-full p-1 text-white opacity-0 transition-opacity group-hover:opacity-100'
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </div>
 
         {/* Show submit image */}
-        {status.text === 'Submitted' && selectedImages.length > 0 && (
+        {status.text === 'Submitted' && (
           <div className='mt-4 grid grid-cols-3 gap-4'>
-            {selectedImages.map((image, index) => (
-              <div key={index} className='group relative'>
-                <img
-                  src={image.preview}
-                  alt={`Selected ${index}`}
-                  className='h-50 w-full rounded-lg object-cover'
-                />
-                <button
-                  onClick={() => removeImage(index)}
-                  className='absolute top-2 right-2 rounded-full p-1 text-white opacity-0 transition-opacity group-hover:opacity-100'
-                >
-                  <X size={16} />
-                </button>
+            {submission?.files && submission?.files.length > 0 && (
+              <div>
+                {submission.files.map((file, index) => (
+                  <div key={index} className='group relative'>
+                    <img
+                      src={`data:${file.mime_type};base64,${file.base64}`}
+                      alt={`Image ${index + 1}`}
+                      className='h-100 w-full rounded-lg object-cover'
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         )}
 
@@ -326,8 +256,8 @@ export default function AssignmentsubmissionDetailPage({
               <X size={24} />
             </button>
             <img
-              src={selectedAssignment.preview}
-              alt={selectedAssignment.name}
+              src={`data:${selectedAssignment.mime_type};base64,${selectedAssignment.base64}`}
+              alt={`Image ${selectedAssignment.name + 1}`}
               className='max-h-screen max-w-full object-contain'
             />
           </div>

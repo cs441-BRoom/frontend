@@ -169,7 +169,7 @@ export default function AssignmentDetailPage({
               {submissions?.map((submission, index) => (
                 <AssignmentSubmissionCard
                   key={index}
-                  id={submission.submission_id}
+                  submissionId={submission.submission_id}
                   username={submission.user_id}
                   dueDate={assignment?.due_date}
                   workspaceId={workspaceId}
@@ -360,6 +360,24 @@ export default function AssignmentDetailPage({
             </div>
           )}
         </div>
+
+        {selectedAssignment && (
+          <div className='bg-opacity-80 fixed inset-0 z-50 flex items-center justify-center bg-black p-4'>
+            <div className='relative max-h-full max-w-4xl'>
+              <button
+                onClick={closeAssignmentView}
+                className='absolute -top-10 right-0 rounded-full p-2 text-white hover:bg-red-500'
+              >
+                <X size={24} />
+              </button>
+              <img
+                src={`data:${selectedAssignment.mime_type};base64,${selectedAssignment.base64}`}
+                alt={`Image ${selectedAssignment.name + 1}`}
+                className='max-h-screen max-w-full object-contain'
+              />
+            </div>
+          </div>
+        )}
       </div>
     );
   }
