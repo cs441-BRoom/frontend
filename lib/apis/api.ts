@@ -83,7 +83,7 @@ export const unlikeNews = async (news_id: number): Promise<boolean> => {
 export const createNews = async (news: CreateNews): Promise<News> => {
   try {
     const response = await axiosInstance.post('/news', news);
-    return response.data.like;
+    return response.data.news;
   } catch (error) {
     console.error('Error creating news:', error);
     throw error; // ข้อผิดพลาดที่เกิดขึ้นจะถูกโยนออกไป

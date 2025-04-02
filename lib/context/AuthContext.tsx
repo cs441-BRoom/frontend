@@ -66,6 +66,7 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
     };
 
     loadUser();
+
   }, []);
 
   return (

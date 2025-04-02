@@ -31,7 +31,11 @@ export default function NewsFeedPage({ params }: NewsfeedPageProps) {
     const loadNews = async () => {
       try {
         const data = await getNewsByWorkspaceId(workspaceId);
-        setNews(data);
+
+        // Filter out invalid items (undefined, null)
+        const validNews = data.filter((item) => item !== undefined && item !== null);
+
+        setNews(validNews);  // Set only valid news items
       } catch (error) {
         console.error('Error fetching news:', error);
       }
@@ -39,6 +43,7 @@ export default function NewsFeedPage({ params }: NewsfeedPageProps) {
 
     loadNews();
   }, [workspaceId]);
+
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -86,14 +91,13 @@ export default function NewsFeedPage({ params }: NewsfeedPageProps) {
   };
 
   const handleLike = async (news_id: number) => {
-    // Update UI immediately - change heart color AND increment like count
     setNews((prevNews) =>
       prevNews.map((item) =>
         item.news_id === news_id
           ? {
             ...item,
             is_liked_by_user: true,
-            like_count: (item.like_count || 0) + 1, // Increment like count
+            like_count: String(Number(item.like_count || 0) + 1), // Convert to number, increment, then back to string
           }
           : item,
       ),
@@ -103,14 +107,13 @@ export default function NewsFeedPage({ params }: NewsfeedPageProps) {
       await likeNews(news_id);
     } catch (error) {
       console.error('Error liking news:', error);
-      // Revert UI changes if API call fails
       setNews((prevNews) =>
         prevNews.map((item) =>
           item.news_id === news_id
             ? {
               ...item,
               is_liked_by_user: false,
-              like_count: (item.like_count || 1) - 1, // Revert like count
+              like_count: String(Math.max(Number(item.like_count || 1) - 1, 0)),
             }
             : item,
         ),
@@ -119,14 +122,13 @@ export default function NewsFeedPage({ params }: NewsfeedPageProps) {
   };
 
   const handleUnlike = async (news_id: number) => {
-    // Update UI immediately - change heart color AND decrement like count
     setNews((prevNews) =>
       prevNews.map((item) =>
         item.news_id === news_id
           ? {
             ...item,
             is_liked_by_user: false,
-            like_count: Math.max((item.like_count || 1) - 1, 0), // Decrement like count (min 0)
+            like_count: String(Math.max(Number(item.like_count || 1) - 1, 0)),
           }
           : item,
       ),
@@ -136,14 +138,13 @@ export default function NewsFeedPage({ params }: NewsfeedPageProps) {
       await unlikeNews(news_id);
     } catch (error) {
       console.error('Error unliking news:', error);
-      // Revert UI changes if API call fails
       setNews((prevNews) =>
         prevNews.map((item) =>
           item.news_id === news_id
             ? {
               ...item,
               is_liked_by_user: true,
-              like_count: (item.like_count || 0) + 1, // Revert like count
+              like_count: String(Number(item.like_count || 0) + 1),
             }
             : item,
         ),

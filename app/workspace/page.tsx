@@ -9,10 +9,12 @@ import {useRouter} from "next/navigation";
 import Modal from "@/components/modal";
 import GradientButton from "@/components/gradeint-button";
 import { useWorkspace } from '@/lib/context/WorkspaceContext';
+import { useAuth } from '@/lib/context/AuthContext';
 
 export default function WorkspacePage() {
   const searchParams = useSearchParams();
   const showOwned = searchParams.get("owner") === "true"; // ถ้า true แสดง workspace ที่เราสร้าง
+  const { user } = useAuth();
 
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -30,7 +32,6 @@ export default function WorkspacePage() {
       try {
         setLoading(true);
         let workspacesData: Workspace[] = [];
-
         if (showOwned) {
           workspacesData = await fetchMyWorkspaces(); // fetch workspaces ที่ผู้ใช้สร้าง
         } else {

@@ -6,13 +6,14 @@ import LoginForm from '../../../components/auth/LoginForm';
 import { useAuth } from '@/lib/context/AuthContext';
 
 export default function LoginPage() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (isAuthenticated && !loading) {
       router.push('/workspace');
     }
+    console.log(user)
   }, [isAuthenticated, loading, router]);
 
 
