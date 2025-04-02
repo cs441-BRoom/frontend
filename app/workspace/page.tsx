@@ -14,7 +14,6 @@ import { useAuth } from '@/lib/context/AuthContext';
 export default function WorkspacePage() {
   const searchParams = useSearchParams();
   const showOwned = searchParams.get("owner") === "true"; // ถ้า true แสดง workspace ที่เราสร้าง
-  const { user } = useAuth();
 
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -101,12 +100,17 @@ export default function WorkspacePage() {
   };
 
   const closeModal = () => {
+    setTitle('');
+    setDescription('');
     setIsModalOpen(false);
   };
 
   const closeJoinModal = () => {
+    setJoinCode('');
+    setJoinError('');
     setIsModalJoinOpen(false);
   };
+
 
   if (loading) {
     return (
