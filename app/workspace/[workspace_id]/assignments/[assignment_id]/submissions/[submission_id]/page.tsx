@@ -3,7 +3,7 @@ import React, { use, useEffect, useState } from 'react';
 import { FileText, X } from 'lucide-react';
 import { isAfter, parseISO } from 'date-fns';
 import { useAuth } from '@/lib/context/AuthContext';
-import { getAssignmentById, getSubmissionBySubmissionId } from '@/lib/apis/api';
+import { getAssignmentById } from '@/lib/apis/api';
 import { Assignment } from '@/types/assignment';
 import { Submission } from '@/types/submission';
 
@@ -107,8 +107,6 @@ export default function AssignmentsubmissionDetailPage({
       try {
         const assignment = await getAssignmentById(assignmentId);
         setAssignment(assignment);
-        const submission = await getSubmissionBySubmissionId(submission_id);
-        setSubmissions(submission);
         console.log(submission);
       } catch (error) {
         console.error('Error fetching assignment:', error);
@@ -149,8 +147,6 @@ export default function AssignmentsubmissionDetailPage({
   };
 
   const status = determineStatus();
-
-  assignment.score += 10;
 
   return (
     <div className='flex h-screen'>
