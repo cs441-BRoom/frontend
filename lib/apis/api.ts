@@ -6,6 +6,7 @@ import {
 } from '@/types/workspace';
 import axiosInstance from '@/lib/apis/axios';
 import { CreateNews, News } from '@/types/news';
+import { Comment } from '@/types/comment';
 import { Like } from '@/types/like';
 import { Assignment, CreateAssignment } from '@/types/assignment';
 import axios from 'axios';
@@ -79,6 +80,11 @@ export const getNewsByWorkspaceId = async (
   return response.data.news;
 };
 
+export const getNewsById = async (news_id:number,workspace_id:number): Promise<News> => {
+  const response = await axiosInstance.get(`/workspaces/${workspace_id}/news/${news_id}`);
+  return response.data.news;
+}
+
 export const likeNews = async (news_id: number): Promise<Like> => {
   try {
     const response = await axiosInstance.post('/like', { news_id });
@@ -96,16 +102,6 @@ export const unlikeNews = async (news_id: number): Promise<boolean> => {
   } catch (error) {
     console.error('Error unliking news:', error);
     return false; // คืนค่าผลลัพธ์ false ถ้าการลบไม่สำเร็จ
-  }
-};
-
-export const createNews = async (news: CreateNews): Promise<News> => {
-  try {
-    const response = await axiosInstance.post('/news', news);
-    return response.data.news;
-  } catch (error) {
-    console.error('Error creating news:', error);
-    throw error; // ข้อผิดพลาดที่เกิดขึ้นจะถูกโยนออกไป
   }
 };
 
@@ -187,4 +183,17 @@ export const getAllSubmissionsByAssignmentId = async (
     console.error('Error get submissions:', error);
     throw error;
   }
+};
+
+export const getCommentsByNewsId = async (newsId: number): Promise<Comment[]> => {
+  const response = await axiosInstance.get(`/news/${newsId}/comments`);
+  return response.data.comments;
+};
+
+export const createComment = async (newsId: number, content: string): Promise<Comment> => {
+  const response = await axiosInstance.post('/comments', {
+    news_id: newsId,
+    content
+  });
+  return response.data.comment;
 };
