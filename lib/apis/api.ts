@@ -9,6 +9,7 @@ import { CreateNews, News } from '@/types/news';
 import { Like } from '@/types/like';
 import { Assignment, CreateAssignment } from '@/types/assignment';
 import axios from 'axios';
+import { Submission } from '@/types/submission';
 
 // Auth API
 export const login = async (
@@ -145,5 +146,28 @@ export const createAssignment = async (
   } catch (error) {
     console.error('Error creating assignment:', error);
     throw error; // ข้อผิดพลาดที่เกิดขึ้นจะถูกโยนออกไป
+  }
+};
+export const getAssignmentById = async (
+  assignment_id: number
+): Promise<Assignment> => {
+  try {
+    const response = await axiosInstance.get(`assignments/${assignment_id}`);
+    return response.data.assignments;
+  } catch (error) {
+    console.error('Error get assignments:', error);
+    throw error;
+  }
+};
+
+export const getSummisionByAssignmentId = async (
+  assignment_id: number
+): Promise<Submission[]> => {
+  try {
+    const response = await axiosInstance.get(`${assignment_id}/submission`);
+    return response.data.assignments;
+  } catch (error) {
+    console.error('Error get submissions:', error);
+    throw error;
   }
 };

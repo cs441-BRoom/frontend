@@ -37,20 +37,6 @@ export default function AssignmentsPage({ params }: AssignmentPageProps) {
   const [description, setDescription] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
 
-  // useEffect(() => {
-  //   if (!selectedWorkspace) {
-  //     router.push("/workspace"); // ถ้าไม่ได้เลือก workspace ให้ไปที่หน้า workspace
-  //   }
-  // }, [selectedWorkspace, router]);
-  //
-  // if (!selectedWorkspace) {
-  //   return (
-  //     <div className="min-h-screen flex justify-center items-center bg-white">
-  //       <div className="animate-spin rounded-full border-4 border-t-4 border-emerald-600 w-16 h-16"></div>
-  //     </div>
-  //   );
-  // }
-
   useEffect(() => {
     const loadAssignments = async () => {
       try {
@@ -66,7 +52,9 @@ export default function AssignmentsPage({ params }: AssignmentPageProps) {
 
   const handleTaskClick = (assignment: Assignment) => {
     setSelectedAssignment(assignment);
-    router.push(`/workspace/${workspaceId}/task/${assignment.assignment_id}`);
+    router.push(
+      `/workspace/${workspaceId}/assignments/${assignment.assignment_id}`
+    );
     console.log(assignment);
   };
 
@@ -115,6 +103,18 @@ export default function AssignmentsPage({ params }: AssignmentPageProps) {
       setFiles((prev) => [...prev, ...selectedFiles]);
     }
 
+    // ตรวจสอบให้แน่ใจว่า images ไม่เป็น undefined และมีค่าที่ต้องการ
+    if (!images || images.length === 0) {
+      console.log('No images selected.');
+      return; // หยุดการทำงานหากไม่มีไฟล์
+    }
+
+    // ตรวจสอบให้แน่ใจว่า selectedDate, title, description, workspaceId มีค่าที่ถูกต้อง
+    if (!title || !description || !selectedDate || !workspaceId) {
+      console.error('Missing required fields.');
+      return;
+    }
+
     const newAssignment = {
       workspace_id: workspaceId,
       title: title,
@@ -123,17 +123,13 @@ export default function AssignmentsPage({ params }: AssignmentPageProps) {
       files: images,
     };
 
-    console.log('images' + images);
-
+    console.log('images', images);
     try {
-      const createNewAssignment = await createAssignment(newAssignment);
-
-      setAssignments((prevAssignment) => [
-        ...prevAssignment,
-        createNewAssignment,
-      ]);
+      await createAssignment(newAssignment);
+      router.push(`/workspace/${workspaceId}/assigments`);
+      setIsModalOpen(false);
     } catch (error) {
-      console.log('sa,dld');
+      console.error('Error creating assignment:', error);
     }
   };
 
