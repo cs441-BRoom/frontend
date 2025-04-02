@@ -167,7 +167,7 @@ export const getAllSubmissionsByAssignmentId = async (
     const response = await axiosInstance.get(
       `/assignments/${assignment_id}/submissions`
     );
-    return response.data.assignments;
+    return response.data.submissions;
   } catch (error) {
     console.error('Error get submissions:', error);
     throw error;
