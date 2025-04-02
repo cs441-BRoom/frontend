@@ -13,14 +13,14 @@ import { Submission } from '@/types/submission';
 
 // Auth API
 export const login = async (
-  credentials: LoginCredentials,
+  credentials: LoginCredentials
 ): Promise<AuthResponse> => {
   const response = await axiosInstance.post('/auth/login', credentials);
   return response.data;
 };
 
 export const register = async (
-  userData: RegisterData,
+  userData: RegisterData
 ): Promise<AuthResponse> => {
   const response = await axiosInstance.post('/auth/register', userData);
   return response.data;
@@ -42,14 +42,14 @@ export const fetchMyWorkspaces = async (): Promise<Workspace[]> => {
 };
 
 export const fetchWorkspaceById = async (
-  workspace_id: number,
+  workspace_id: number
 ): Promise<Workspace> => {
   const response = await axiosInstance.get(`/workspaces/${workspace_id}`);
   return response.data.workspace;
 };
 
 export const createWorkspace = async (
-  data: CreateWorkspaceData,
+  data: CreateWorkspaceData
 ): Promise<Workspace> => {
   try {
     const response = await axiosInstance.post('/workspaces', data);
@@ -61,7 +61,7 @@ export const createWorkspace = async (
 };
 
 export const joinWorkspace = async (
-  data: JoinWorkspace,
+  data: JoinWorkspace
 ): Promise<Workspace> => {
   try {
     const response = await axiosInstance.post('/workspaces/join', data);
@@ -73,7 +73,7 @@ export const joinWorkspace = async (
 };
 
 export const getNewsByWorkspaceId = async (
-  workspace_id: number,
+  workspace_id: number
 ): Promise<News[]> => {
   const response = await axiosInstance.get(`/workspaces/${workspace_id}/news`);
   return response.data.news;
@@ -109,7 +109,9 @@ export const createNews = async (news: CreateNews): Promise<News> => {
   }
 };
 
-export const createNewsWithFiles = async (formData: FormData): Promise<News> => {
+export const createNewsWithFiles = async (
+  formData: FormData
+): Promise<News> => {
   try {
     const response = await axiosInstance.post('/news', formData, {
       headers: {
@@ -123,13 +125,12 @@ export const createNewsWithFiles = async (formData: FormData): Promise<News> => 
   }
 };
 
-
 export const getAllAssignmentByWorkspaceId = async (
-  workspaceId: number,
+  workspaceId: number
 ): Promise<Assignment[]> => {
   try {
     const response = await axiosInstance.get(
-      `workspaces/${workspaceId}/assignments`,
+      `workspaces/${workspaceId}/assignments`
     );
     return response.data.assignments;
   } catch (error) {
@@ -139,7 +140,7 @@ export const getAllAssignmentByWorkspaceId = async (
 };
 
 export const createAssignment = async (
-  assignment: CreateAssignment,
+  assignment: CreateAssignment
 ): Promise<Assignment> => {
   try {
     const formData = new FormData();
@@ -164,7 +165,7 @@ export const createAssignment = async (
   }
 };
 export const getAssignmentById = async (
-  assignment_id: number,
+  assignment_id: number
 ): Promise<Assignment> => {
   try {
     const response = await axiosInstance.get(`assignments/${assignment_id}`);
@@ -175,16 +176,14 @@ export const getAssignmentById = async (
   }
 };
 
-export const getAllSubmissionsByAssignmentId = async (
-  assignment_id: number,
-): Promise<Submission[]> => {
+export const getSubmissionBySubmissionId = async (
+  submission_id: number
+): Promise<Submission> => {
   try {
-    const response = await axiosInstance.get(
-      `/assignments/${assignment_id}/submissions`,
-    );
-    return response.data.submissions;
+    const response = await axiosInstance.get(`/submissions/${submission_id}`);
+    return response.data.submission;
   } catch (error) {
-    console.error('Error get submissions:', error);
+    console.error('Error get submission:', error);
     throw error;
   }
 };
