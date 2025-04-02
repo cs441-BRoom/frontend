@@ -11,7 +11,13 @@ export interface Submission {
 
   status: string;
 
-  files: [];
+  files: SubmissionFile[];
+}
+
+export interface SubmissionFile {
+  name: string;
+  base64: string;
+  mime_type: string;
 }
 
 export interface CreateSubmission {

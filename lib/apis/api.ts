@@ -6,9 +6,13 @@ import {
 } from '@/types/workspace';
 import axiosInstance from '@/lib/apis/axios';
 import { CreateNews, News } from '@/types/news';
+import { Comment } from '@/types/comment';
 import { Like } from '@/types/like';
-import { Assignment, CreateAssignment } from '@/types/assignment';
-import axios from 'axios';
+import {
+  Assignment,
+  CreateAssignment,
+  SubmitAssignment,
+} from '@/types/assignment';
 import { Submission } from '@/types/submission';
 
 // Auth API
@@ -76,6 +80,16 @@ export const getNewsByWorkspaceId = async (
   workspace_id: number
 ): Promise<News[]> => {
   const response = await axiosInstance.get(`/workspaces/${workspace_id}/news`);
+  return response.data.news;
+};
+
+export const getNewsById = async (
+  news_id: number,
+  workspace_id: number
+): Promise<News> => {
+  const response = await axiosInstance.get(
+    `/workspaces/${workspace_id}/news/${news_id}`
+  );
   return response.data.news;
 };
 
@@ -176,14 +190,70 @@ export const getAssignmentById = async (
   }
 };
 
-export const getSubmissionBySubmissionId = async (
-  submission_id: number
-): Promise<Submission> => {
+export const getAllSubmissionsByAssignmentId = async (
+  assignment_id: number
+): Promise<Submission[]> => {
   try {
-    const response = await axiosInstance.get(`/submissions/${submission_id}`);
-    return response.data.submission;
+    const response = await axiosInstance.get(
+      `/assignments/${assignment_id}/submissions`
+    );
+    return response.data.submissions;
   } catch (error) {
     console.error('Error get submission:', error);
     throw error;
   }
+};
+
+export const submitAssignment = async (
+  assignment: SubmitAssignment
+): Promise<Assignment> => {
+  try {
+    const formData = new FormData();
+    formData.append('assignment_id', assignment.assignment_id.toString());
+
+    assignment.files.forEach((file) => {
+      formData.append('files[]', file);
+    });
+
+    const response = await axiosInstance.post('/submissions/submit', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error submit assignment:', error);
+    throw error; // ข้อผิดพลาดที่เกิดขึ้นจะถูกโยนออกไป
+  }
+};
+
+export const getMySubmission = async (
+  assignment_id: number
+): Promise<Submission> => {
+  try {
+    const response = await axiosInstance.get(
+      `/assignments/${assignment_id}/mysubmission`
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error get submissions:', error);
+    throw error;
+  }
+};
+export const getCommentsByNewsId = async (
+  newsId: number
+): Promise<Comment[]> => {
+  const response = await axiosInstance.get(`/news/${newsId}/comments`);
+  return response.data.comments;
+};
+
+export const createComment = async (
+  newsId: number,
+  content: string
+): Promise<Comment> => {
+  const response = await axiosInstance.post('/comments', {
+    news_id: newsId,
+    content,
+  });
+  return response.data.comment;
 };

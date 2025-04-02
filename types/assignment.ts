@@ -21,7 +21,13 @@ export interface Assignment {
 
   score: number;
 
-  files: [];
+  files: AssignmentFile[];
+}
+
+export interface AssignmentFile {
+  name: string;
+  base64: string;
+  mime_type: string;
 }
 
 export interface CreateAssignment {
@@ -29,5 +35,10 @@ export interface CreateAssignment {
   title: string;
   description: string;
   due_date: string;
+  files: File[];
+}
+
+export interface SubmitAssignment {
+  assignment_id: number;
   files: File[];
 }

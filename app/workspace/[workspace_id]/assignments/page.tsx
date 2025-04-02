@@ -90,7 +90,6 @@ export default function AssignmentsPage({ params }: AssignmentPageProps) {
   }
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('click');
     if (event.target.files) {
       const selectedFiles = Array.from(event.target.files);
 

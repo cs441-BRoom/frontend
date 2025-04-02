@@ -6,40 +6,50 @@ import { useWorkspace } from '@/lib/context/WorkspaceContext';
 import GradientButton from '@/components/gradeint-button';
 import { useState, useEffect } from 'react';
 import { Workspace } from '@/types/workspace';
-import { fetchWorkspaceById } from '@/lib/apis/api'; // Import ฟังก์ชัน API
+import { fetchWorkspaceById } from '@/lib/apis/api';
 
 export default function WorkspaceSidebar() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const pathname = usePathname();
-  const { selectedWorkspace, setSelectedWorkspace } = useWorkspace(); // ใช้ context
+  const { selectedWorkspace, setSelectedWorkspace } = useWorkspace();
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeItem, setActiveItem] = useState<string>('newsfeed');
 
-  // ดึง workspace_id จาก URL เช่น /workspace/123/newsfeed → workspace_id = 123
-  const workspaceId = pathname.split('/')[2]; // ดึงค่าจาก segment ที่ 2
-  const [isLoading, setIsLoading] = useState(true); // ✅ เพิ่ม state เช็คการโหลดข้อมูล
+  // Extract workspaceId from URL
+  const workspaceId = pathname.split('/')[2];
+
   useEffect(() => {
     if (!selectedWorkspace) {
       fetchWorkspaceById(Number(workspaceId))
         .then((workspace: Workspace) => {
           setSelectedWorkspace(workspace);
-          setIsLoading(false); // ✅ หยุดโหลดเมื่อได้ workspace
+          setIsLoading(false);
         })
         .catch(() => {
           setIsLoading(false);
-          router.replace('/workspace'); // ✅ Redirect เฉพาะถ้าโหลดไม่สำเร็จ
+          router.replace('/workspace');
         });
     } else {
-      setIsLoading(false); // ✅ หยุดโหลดถ้ามี workspace แล้ว
+      setIsLoading(false);
     }
   }, [workspaceId, selectedWorkspace, setSelectedWorkspace, router]);
 
-
-  const [activeItem, setActiveItem] = useState<string>('newsfeed');
-
+  // Determine active item based on current path
   useEffect(() => {
-    const active = searchParams.get('section') || 'newsfeed';
-    setActiveItem(active);
-  }, [searchParams]);
+    const pathSegments = pathname.split('/');
+    if (pathSegments.length >= 4) {
+      const section = pathSegments[3];
+      if (section === 'newsfeed' || section === 'assignments') {
+        setActiveItem(section);
+      } else if (section === 'assignment' && pathSegments.length > 4) {
+        // Handle assignment detail pages
+        setActiveItem('assignments');
+      } else if (section === 'newsfeed' && pathSegments.length > 4) {
+        // Handle newsfeed detail pages
+        setActiveItem('newsfeed');
+      }
+    }
+  }, [pathname]);
 
   const handleGoBack = () => {
     router.push('/workspace');
@@ -47,7 +57,7 @@ export default function WorkspaceSidebar() {
 
   const handleNavigation = (item: { id: string; href: string }) => {
     setActiveItem(item.id);
-    router.push(`${item.href}?section=${item.id}`);
+    router.push(item.href);
   };
 
   const menuItems = [
@@ -58,16 +68,24 @@ export default function WorkspaceSidebar() {
       href: selectedWorkspace ? `/workspace/${selectedWorkspace.workspace_id}/newsfeed` : '#',
     },
     {
-      icon: BookText,
       id: 'assignments',
+      icon: BookText,
       label: 'Assignments',
       href: selectedWorkspace ? `/workspace/${selectedWorkspace.workspace_id}/assignments` : '#',
     },
   ];
 
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-64 items-center justify-center border-r border-gray-300 bg-white">
+        <div className="animate-spin rounded-full border-4 border-t-4 border-emerald-600 w-8 h-8"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen">
-      <div className="w-64 border-r bg-white px-4 py-6">
+      <div className="w-64 border-r border-gray-300 bg-white px-4 py-6">
         {selectedWorkspace && (
           <div>
             <div className="flex justify-between">
@@ -80,7 +98,7 @@ export default function WorkspaceSidebar() {
           </div>
         )}
 
-        <nav>
+        <nav className="mt-6">
           {menuItems.map((item) => (
             <button
               key={item.id}
@@ -90,7 +108,7 @@ export default function WorkspaceSidebar() {
               }`}
             >
               <item.icon className="h-5 w-5" />
-              {item.label}
+              <span className="text-sm font-medium">{item.label}</span>
             </button>
           ))}
         </nav>

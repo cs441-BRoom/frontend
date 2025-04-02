@@ -9,6 +9,8 @@ import { useWorkspace } from '@/lib/context/WorkspaceContext';
 import {
   getAssignmentById,
   getAllSubmissionsByAssignmentId,
+  submitAssignment,
+  getMySubmission,
 } from '@/lib/apis/api';
 import { Assignment } from '@/types/assignment';
 import { Submission } from '@/types/submission';
@@ -37,15 +39,18 @@ export default function AssignmentDetailPage({
   const assignmentId = Number(unwrappedParams.assignment_id);
   const { selectedWorkspace } = useWorkspace();
   const [showOwned, setShowOwned] = useState<boolean>(false);
-  const [selectedImages, setSelectedImages] = useState<ImageFile[]>([]);
+  const [images, setImages] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
   const [submittedImages, setSubmittedImages] = useState<ImageFile[]>([]);
   const [assignmentImages, setAssignmentImages] = useState<AssignmentImage[]>(
     []
   );
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] =
     useState<AssignmentImage | null>(null);
   const [assignment, setAssignment] = useState<Assignment>();
   const [submissions, setSubmissions] = useState<Submission[]>();
+  const [mySubmission, setMySubmission] = useState<Submission>();
 
   const router = useRouter();
 
@@ -57,6 +62,9 @@ export default function AssignmentDetailPage({
 
         const submissions = await getAllSubmissionsByAssignmentId(assignmentId);
         setSubmissions(submissions);
+
+        const my_submission = await getMySubmission(assignmentId);
+        setMySubmission(my_submission);
       } catch (error) {
         console.error('Error fetching assignment:', error);
       }
@@ -71,28 +79,42 @@ export default function AssignmentDetailPage({
     );
   };
 
-  const handleSubmitAssignment = () => {
-    alert('Assignment submitted!');
+  const handleSubmitAssignment = async () => {
+    const assignment = {
+      assignment_id: assignmentId,
+      files: images,
+    };
+
+    try {
+      await submitAssignment(assignment);
+      router.push(`/workspace/${workspaceId}/assigments`);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Error creating assignment:', error);
+    }
   };
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files) return;
+    if (event.target.files) {
+      const selectedFiles = Array.from(event.target.files);
 
-    const newImages: ImageFile[] = Array.from(files)
-      .filter((file) => file.type.startsWith('image/'))
-      .map((file) => ({
-        file,
-        preview: URL.createObjectURL(file),
-      }));
+      if (selectedFiles.length + images.length > 3) {
+        alert('You can only upload up to 3 images.');
+        return;
+      }
 
-    setSelectedImages((prevImages) => [...prevImages, ...newImages]);
+      const newPreviews = selectedFiles.map((file) =>
+        URL.createObjectURL(file)
+      );
+
+      setImages((prev) => [...prev, ...selectedFiles]);
+      setPreviews((prev) => [...prev, ...newPreviews]);
+    }
   };
 
-  const removeImage = (indexToRemove: number) => {
-    setSelectedImages((prevImages) =>
-      prevImages.filter((_, index) => index !== indexToRemove)
-    );
+  const removeImage = (index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+    setPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
   const openAssignmentImage = (assignment: AssignmentImage) => {
@@ -108,24 +130,6 @@ export default function AssignmentDetailPage({
       setShowOwned(true);
     }
   }, [selectedWorkspace, user]);
-
-  const handleSubmit = () => {
-    if (selectedImages.length === 0) {
-      alert('Please select images to submit');
-      return;
-    }
-
-    setSubmittedImages((prev) => [...prev, ...selectedImages]);
-
-    selectedImages.forEach((imageFile) => {
-      const formData = new FormData();
-      formData.append('file', imageFile.file);
-
-      console.log('Submitting file:', imageFile.file.name);
-    });
-
-    setSelectedImages([]);
-  };
 
   const determineStatus = () => {
     const now = new Date();
@@ -153,9 +157,9 @@ export default function AssignmentDetailPage({
     return { text: 'Pending', color: 'text-blue-600' };
   };
 
-  //   const status = determineStatus();
+  const status = determineStatus();
 
-  const status = { text: 'Pending', color: 'text-green-600' };
+  // const status = { text: 'Pending', color: 'text-green-600' };
 
   if (showOwned) {
     return (
@@ -294,14 +298,14 @@ export default function AssignmentDetailPage({
                   </div>
                 </div>
               )}
-              {selectedImages.length > 0 && (
+              {previews.length > 0 && (
                 <div className='mt-4 grid grid-cols-3 gap-4'>
-                  {selectedImages.map((image, index) => (
+                  {previews.map((image, index) => (
                     <div key={index} className='group relative'>
                       <img
-                        src={image.preview}
+                        src={image}
                         alt={`Selected ${index}`}
-                        className='h-50 w-full rounded-lg object-cover'
+                        className='h-100 w-full rounded-lg object-cover'
                       />
                       <button
                         onClick={() => removeImage(index)}
@@ -363,23 +367,21 @@ export default function AssignmentDetailPage({
           )}
 
           {/* Show submit image */}
-          {status.text === 'Submitted' && selectedImages.length > 0 && (
-            <div className='mt-4 grid grid-cols-3 gap-4'>
-              {selectedImages.map((image, index) => (
-                <div key={index} className='group relative'>
-                  <img
-                    src={image.preview}
-                    alt={`Selected ${index}`}
-                    className='h-50 w-full rounded-lg object-cover'
-                  />
-                  <button
-                    onClick={() => removeImage(index)}
-                    className='absolute top-2 right-2 rounded-full p-1 text-white opacity-0 transition-opacity group-hover:opacity-100'
-                  >
-                    <X size={16} />
-                  </button>
+          {status.text === 'Submitted' && (
+            <div className='mt-4 grid grid-cols-3 gap-4 pr-10 pl-10'>
+              {mySubmission?.files && mySubmission?.files.length > 0 && (
+                <div>
+                  {mySubmission.files.map((file, index) => (
+                    <div key={index} className='group relative'>
+                      <img
+                        src={`data:${file.mime_type};base64,${file.base64}`}
+                        alt={`Image ${index + 1}`}
+                        className='h-100 w-full rounded-lg object-cover'
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           )}
 
