@@ -24,7 +24,7 @@ export default function NewsCard({ news, onClick, onLikeClick, isDetailView = fa
       <div className="mb-3 flex items-center">
         <div className="mr-3 h-8 w-8 rounded-full bg-gray-300"></div>
         <div className="flex-grow">
-          <div className="text-sm font-medium text-gray-800">Created by {news.created_by}</div>
+          <div className="text-sm font-medium text-gray-800">{news.created_by}</div>
           <div className="text-xs text-gray-500">{news.created_at}</div>
         </div>
       </div>

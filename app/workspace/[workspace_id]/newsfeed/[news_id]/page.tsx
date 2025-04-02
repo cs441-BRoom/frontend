@@ -169,7 +169,7 @@ export default function NewsDetailPage({ params }: NewsDetailPageProps) {
                   <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0"></div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium">User {comment.created_by}</span>
+                      <span className="font-medium">{comment.created_by}</span>
                       <span className="text-xs text-gray-500">
                         {new Date(comment.created_at).toLocaleString('en-US', {
                           year: 'numeric',

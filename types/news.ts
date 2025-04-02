@@ -6,7 +6,7 @@ export interface News {
   comments_count: string;
   like_count: string;
   is_liked_by_user: boolean;
-  created_by: number;
+  created_by: string;
   created_at: string;
   files?: NewsFile[];
 }

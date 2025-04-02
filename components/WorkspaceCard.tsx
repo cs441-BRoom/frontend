@@ -20,7 +20,7 @@ export default function WorkspaceCard
       <div className="mb-4 flex items-center justify-between">
         <div className="flex flex-col">
           <h3 className="text-lg font-semibold text-gray-800">{name}</h3>
-          <span className="text-sm text-gray-500">{created_by}</span>
+          <span className="text-sm text-gray-500">By: {created_by}</span>
         </div>
 
         <button className="text-gray-500 hover:text-gray-700">
