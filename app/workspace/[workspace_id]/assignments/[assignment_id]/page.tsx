@@ -154,7 +154,7 @@ export default function AssignmentDetailPage({
   if (showOwned) {
     return (
       <div className='flex h-screen'>
-        <div className='p-6'>
+        <div className='w-[100%] p-6'>
           <div className='flex flex-row justify-end'></div>
           <div className='flex w-full flex-col items-center justify-center'>
             <hr className='my-4' />
