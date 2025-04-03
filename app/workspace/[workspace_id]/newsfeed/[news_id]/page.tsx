@@ -166,7 +166,6 @@ export default function NewsDetailPage({ params }: NewsDetailPageProps) {
             sortedComments.map(comment => (
               <div key={comment.comment_id} className="border-b pb-4 last:border-b-0">
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0"></div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{comment.created_by}</span>
