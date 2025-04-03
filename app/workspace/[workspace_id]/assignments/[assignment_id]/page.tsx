@@ -1,0 +1,385 @@
+'use client';
+import React, { use, useEffect, useState } from 'react';
+import { FileText, Image, X } from 'lucide-react';
+import { isAfter, parseISO } from 'date-fns';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/context/AuthContext';
+import AssignmentSubmissionCard from '@/components/assignment-submission-card';
+import { useWorkspace } from '@/lib/context/WorkspaceContext';
+import {
+  getAssignmentById,
+  getAllSubmissionsByAssignmentId,
+  submitAssignment,
+  getMySubmission,
+} from '@/lib/apis/api';
+import { Assignment } from '@/types/assignment';
+import { Submission } from '@/types/submission';
+
+interface AssignmentDetailPageProps {
+  params: Promise<{ workspace_id: string; assignment_id: number }>;
+}
+
+interface AssignmentImage {
+  name: string;
+  base64: string;
+  mime_type: string;
+}
+
+export default function AssignmentDetailPage({
+  params,
+}: AssignmentDetailPageProps) {
+  const unwrappedParams = use(params);
+  const { user } = useAuth();
+  const workspaceId = Number(unwrappedParams.workspace_id);
+  const assignmentId = Number(unwrappedParams.assignment_id);
+  const { selectedWorkspace } = useWorkspace();
+  const [showOwned, setShowOwned] = useState<boolean>(false);
+  const [images, setImages] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
+  const [assignmentImages, setAssignmentImages] = useState<AssignmentImage[]>(
+    []
+  );
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedAssignment, setSelectedAssignment] =
+    useState<AssignmentImage | null>(null);
+  const [assignment, setAssignment] = useState<Assignment>();
+  const [submissions, setSubmissions] = useState<Submission[]>();
+  const [mySubmission, setMySubmission] = useState<Submission>();
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (selectedWorkspace?.created_by === user?.user_id) {
+      setShowOwned(true);
+    }
+  }, [selectedWorkspace, user]);
+
+  useEffect(() => {
+    const loadAssignment = async () => {
+      try {
+        const assignment = await getAssignmentById(assignmentId);
+        setAssignment(assignment);
+        setAssignmentImages(assignment.files);
+
+        const submissions = await getAllSubmissionsByAssignmentId(assignmentId);
+        setSubmissions(submissions);
+
+        if (selectedWorkspace?.created_by !== user?.user_id) {
+          const my_submission = await getMySubmission(assignmentId);
+          setMySubmission(my_submission);
+        }
+      } catch (error) {
+        console.error('Error fetching assignment:', error);
+      }
+    };
+
+    loadAssignment();
+  }, [assignmentId]);
+
+  const handleTaskClick = (submissionId: number) => {
+    router.push(
+      `/workspace/${workspaceId}/assignments/${assignmentId}/submissions/${submissionId}`
+    );
+  };
+
+  const handleSubmitAssignment = async () => {
+    const assignment = {
+      assignment_id: assignmentId,
+      files: images,
+    };
+
+    try {
+      await submitAssignment(assignment);
+      router.push(`/workspace/${workspaceId}/assigments`);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Error creating assignment:', error);
+    }
+  };
+
+  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const selectedFiles = Array.from(event.target.files);
+
+      if (selectedFiles.length + images.length > 3) {
+        alert('You can only upload up to 3 images.');
+        return;
+      }
+
+      const newPreviews = selectedFiles.map((file) =>
+        URL.createObjectURL(file)
+      );
+
+      setImages((prev) => [...prev, ...selectedFiles]);
+      setPreviews((prev) => [...prev, ...newPreviews]);
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+    setPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const openAssignmentImage = (assignment: AssignmentImage) => {
+    setSelectedAssignment(assignment);
+  };
+
+  const closeAssignmentView = () => {
+    setSelectedAssignment(null);
+  };
+
+  const determineStatus = () => {
+    const now = new Date();
+    const parsedDueDate = assignment?.due_date
+      ? parseISO(assignment.due_date)
+      : null;
+    const parsedSubmissionDate = assignment?.submission_date
+      ? parseISO(assignment.submission_date)
+      : null;
+
+    if (parsedDueDate === null) {
+      return { text: 'No Due Date', color: 'text-gray-600' }; // กรณีที่ไม่มี due_date
+    }
+
+    if (parsedSubmissionDate) {
+      if (!isAfter(parsedSubmissionDate, parsedDueDate)) {
+        return { text: 'Submitted', color: 'text-green-600' };
+      }
+    }
+
+    if (isAfter(now, parsedDueDate)) {
+      return { text: 'Past Due', color: 'text-red-600' };
+    }
+
+    return { text: 'Pending', color: 'text-blue-600' };
+  };
+
+  const status = determineStatus();
+
+  // const status = { text: 'Pending', color: 'text-green-600' };
+
+  if (showOwned) {
+    return (
+      <div className='flex h-screen'>
+        <div className='w-[100%] p-6'>
+          <div className='flex flex-row justify-end'></div>
+          <div className='flex w-full flex-col items-center justify-center'>
+            <hr className='my-4' />
+            <div className='flex w-full flex-col items-center justify-center gap-6'>
+              {submissions?.map((submission, index) => (
+                <AssignmentSubmissionCard
+                  key={index}
+                  submissionId={submission.submission_id}
+                  username={submission.user_id}
+                  dueDate={assignment?.due_date}
+                  workspaceId={workspaceId}
+                  submissionDate={submission.submit_at}
+                  onClick={handleTaskClick}
+                  user_full_name={submission.user_full_name}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  } else {
+    return (
+      <div className='flex h-screen'>
+        <div className='flex-1 bg-gray-50'>
+          <div className='p-6'>
+            <div className='p-4'>
+              <div className='flex flex-row justify-between'>
+                <div className='flex w-full flex-row justify-between'>
+                  <div className='flex flex-row'>
+                    <div className='mr-3 h-13 w-13 rounded-full bg-gray-300'></div>
+                    <div className='flex flex-col'>
+                      <div className='text-lg font-medium text-gray-800'>
+                        {assignment?.created_by_username}
+                      </div>
+                      <div className='text-sm font-medium text-gray-800'>
+                        {assignment?.title}
+                      </div>
+                    </div>
+                  </div>
+                  <div className='flex flex-row gap-3'>
+                    <div className='flex flex-col justify-items-end'>
+                      <p className='justify-end text-xl text-green-600'>
+                        {status.text}
+                      </p>
+                      <p className='text-lg text-gray-600'>
+                        Due: {assignment?.due_date}
+                      </p>
+                    </div>
+                    <button
+                      className={`h-12 w-32 rounded-md p-3 text-lg text-white ${
+                        status.text === 'Pending'
+                          ? 'cursor-pointer bg-green-500'
+                          : 'cursor-not-allowed bg-gray-500'
+                      }`}
+                      disabled={status.text !== 'Pending'}
+                      onClick={
+                        status.text === 'Pending'
+                          ? handleSubmitAssignment
+                          : undefined
+                      }
+                    >
+                      {status.text === 'Pending'
+                        ? 'Submit'
+                        : status.text === 'Submitted'
+                          ? 'Submitted'
+                          : 'Late'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <hr className='my-4' />
+              <div className='flex flex-row'>
+                <div className='w-full'>
+                  <p className='text-gray-800'>{assignment?.description}</p>
+                </div>
+                <div>
+                  <p className='w-40 text-2xl text-gray-700'>
+                    {assignment?.score ? `${assignment.score} Points` : ''}
+                  </p>
+                </div>
+              </div>
+              <div className='flex flex-row gap-2'>
+                {assignmentImages.map((assignment, index) => (
+                  <div
+                    key={assignment.name}
+                    onClick={() => openAssignmentImage(assignment)}
+                    className='cursor-pointer overflow-hidden rounded-lg border transition-shadow hover:shadow-lg'
+                  >
+                    <div className='relative'>
+                      <img
+                        src={`data:${assignment.mime_type};base64,${assignment.base64}`}
+                        alt={`Image ${index + 1}`}
+                        className='h-32 w-48 object-cover'
+                      />
+                      <div className='bg-opacity-50 absolute right-0 bottom-0 left-0 flex items-center bg-black p-2 text-white'>
+                        <FileText className='mr-2' size={16} />
+                        {assignment.name}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <hr className='my-4' />
+              {previews.length > 0 && (
+                <div className='mt-4 grid grid-cols-3 gap-4'>
+                  {previews.map((image, index) => (
+                    <div key={index} className='group relative'>
+                      <img
+                        src={image}
+                        alt={`Selected ${index}`}
+                        className='h-100 w-full rounded-lg object-cover'
+                      />
+                      <button
+                        onClick={() => removeImage(index)}
+                        className='absolute top-2 right-2 rounded-full p-1 text-white opacity-0 transition-opacity group-hover:opacity-100'
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+          {/* file selector */}
+          {status.text === 'Pending' && (
+            <div className='p-5'>
+              <div className='rounded-lg border-2 border-dashed border-gray-300 p-4'>
+                <input
+                  type='file'
+                  accept='image/*'
+                  multiple
+                  className='hidden'
+                  id='image-upload'
+                  onChange={handleImageSelect}
+                />
+                <label
+                  htmlFor='image-upload'
+                  className='flex cursor-pointer items-center justify-center text-gray-600'
+                >
+                  <Image className='mr-2' /> Add your Images
+                </label>
+              </div>
+            </div>
+          )}
+
+          {/* Show image form assignment */}
+          {status.text === 'Pending' && assignmentImages.length > 0 && (
+            <div className='flex flex-row gap-2'>
+              {assignmentImages.map((assignment, index) => (
+                <div
+                  key={assignment.name}
+                  onClick={() => openAssignmentImage(assignment)}
+                  className='cursor-pointer overflow-hidden rounded-lg border transition-shadow hover:shadow-lg'
+                >
+                  <div className='relative'>
+                    <img
+                      src={`data:${assignment.mime_type};base64,${assignment.base64}`}
+                      alt={`Image ${index + 1}`}
+                      className='h-32 w-48 object-cover'
+                    />
+                    <div className='bg-opacity-50 absolute right-0 bottom-0 left-0 flex items-center bg-black p-2 text-white'>
+                      <FileText className='mr-2' size={16} />
+                      {assignment.name}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Show submit image */}
+          {status.text === 'Submitted' && (
+            <div className='mt-4 grid grid-cols-3 gap-4 pr-10 pl-10'>
+              {mySubmission?.files && mySubmission?.files.length > 0 && (
+                <div>
+                  {mySubmission.files.map((file, index) => (
+                    <div key={index} className='group relative'>
+                      <img
+                        src={`data:${file.mime_type};base64,${file.base64}`}
+                        alt={`Image ${index + 1}`}
+                        className='h-100 w-full rounded-lg object-cover'
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* If status is Past-due, show nothing */}
+          {status.text === 'Past-due' && (
+            <div className='text-center text-gray-500'>
+              No file upload available.
+            </div>
+          )}
+        </div>
+
+        {selectedAssignment && (
+          <div className='bg-opacity-80 fixed inset-0 z-50 flex items-center justify-center bg-black p-4'>
+            <div className='relative max-h-full max-w-4xl'>
+              <button
+                onClick={closeAssignmentView}
+                className='absolute -top-10 right-0 rounded-full p-2 text-white hover:bg-red-500'
+              >
+                <X size={24} />
+              </button>
+              <img
+                src={`data:${selectedAssignment.mime_type};base64,${selectedAssignment.base64}`}
+                alt={`Image ${selectedAssignment.name + 1}`}
+                className='max-h-screen max-w-full object-contain'
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+}

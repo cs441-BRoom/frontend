@@ -1,27 +1,26 @@
-'use client'
-import { useEffect, useState } from 'react';
-import LoginPage from './auth/login/page';
-import { useRouter } from 'next/navigation';
-import JoinedWorkspace from '@/app/workspace/page';
+// app/page.tsx
+'use client';
 
-export default function Home() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/context/AuthContext';
+
+export default function HomePage() {
   const router = useRouter();
+  const { user } = useAuth();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-
-    if (token) {
-      setIsAuthenticated(true);
+    // Redirect ตามสถานะการล็อกอิน
+    if (user) {
+      router.push('/workspace'); // หรือหน้าแรกหลังจากล็อกอิน
     } else {
-      setIsAuthenticated(false);
-      router.push('/auth/login');
+      router.push('/login'); // หรือหน้า login
     }
-  }, [router]);
+  }, [user, router]);
 
-  if (!isAuthenticated) {
-    return <LoginPage />;
-  }
-
-  return <JoinedWorkspace/>;
+  return (
+    <div className="flex items-center justify-center h-screen">
+      <div className="animate-spin rounded-full border-4 border-t-4 border-emerald-600 w-16 h-16"></div>
+    </div>
+  );
 }
