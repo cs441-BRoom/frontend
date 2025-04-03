@@ -149,7 +149,7 @@ export default function WorkspacePage() {
               name={workspace.name}
               description={workspace.description}
               members_count={workspace.members_count}
-              created_by={workspace.created_by}
+              user_detail={workspace.user_detail}
               onClick={() => handleCardClick(workspace)}
             />
           ))

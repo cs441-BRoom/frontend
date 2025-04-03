@@ -5,12 +5,12 @@ type WorkspaceCardProps = {
   name: string;
   description: string;
   members_count: string;
-  created_by: string;
+  user_detail:string;
   onClick: (id: number) => void;
 };
 
 export default function WorkspaceCard
-({workspace_id, name, description, members_count, created_by, onClick}: WorkspaceCardProps) {
+({workspace_id, name, description, members_count,user_detail, onClick}: WorkspaceCardProps) {
   return (
     <div
       className="rounded-lg bg-white p-6 shadow-md transition-shadow duration-300 hover:shadow-lg cursor-pointer h-60 transform active:scale-95 flex flex-col"
@@ -20,7 +20,7 @@ export default function WorkspaceCard
       <div className="mb-4 flex items-center justify-between">
         <div className="flex flex-col">
           <h3 className="text-lg font-semibold text-gray-800">{name}</h3>
-          <span className="text-sm text-gray-500">By: {created_by}</span>
+          <span className="text-sm text-gray-500">By: {user_detail}</span>
         </div>
 
         <button className="text-gray-500 hover:text-gray-700">

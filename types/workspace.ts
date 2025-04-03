@@ -4,7 +4,8 @@ export interface Workspace {
     description: string;
     join_code: string;
     members_count: string;
-    created_by: string;
+    created_by: number;
+    user_detail:string;
     created_at: string;
     update_at: string;
 }
