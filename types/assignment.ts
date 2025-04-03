@@ -21,6 +21,10 @@ export interface Assignment {
 
   score: number;
 
+  created_by_full_name: string;
+
+  created_by_username: string;
+
   files: AssignmentFile[];
 }
 

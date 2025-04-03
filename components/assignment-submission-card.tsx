@@ -9,15 +9,16 @@ interface AssignmentSubmissionCardProps {
   workspaceId: number;
   submissionDate?: string;
   onClick: (submissionId: number) => void;
+  user_full_name: string;
 }
 
 export default function AssignmentSubmissionCard({
   submissionId,
   dueDate,
-  username,
   submissionDate,
   assignmentId,
   onClick,
+  user_full_name,
 }: AssignmentSubmissionCardProps) {
   const determineStatus = () => {
     const now = new Date();
@@ -47,7 +48,9 @@ export default function AssignmentSubmissionCard({
         <div className='flex items-center'>
           <div className='mr-3 h-10 w-10 rounded-full bg-gray-300'></div>
           <div className='flex flex-col'>
-            <div className='text-lg font-medium text-gray-800'>{username}</div>
+            <div className='text-lg font-medium text-gray-800'>
+              {user_full_name}
+            </div>
             <div className='text-sm text-gray-500'></div>
           </div>
         </div>

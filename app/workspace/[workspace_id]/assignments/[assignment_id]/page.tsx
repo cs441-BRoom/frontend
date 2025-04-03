@@ -175,6 +175,7 @@ export default function AssignmentDetailPage({
                   workspaceId={workspaceId}
                   submissionDate={submission.submit_at}
                   onClick={handleTaskClick}
+                  user_full_name={submission.user_full_name}
                 />
               ))}
             </div>
@@ -194,7 +195,7 @@ export default function AssignmentDetailPage({
                     <div className='mr-3 h-13 w-13 rounded-full bg-gray-300'></div>
                     <div className='flex flex-col'>
                       <div className='text-lg font-medium text-gray-800'>
-                        {assignment?.created_by}
+                        {assignment?.created_by_username}
                       </div>
                       <div className='text-sm font-medium text-gray-800'>
                         {assignment?.title}

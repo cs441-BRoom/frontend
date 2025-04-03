@@ -1,6 +1,5 @@
 import React from 'react';
 import { format, parseISO, isAfter } from 'date-fns';
-import { Assignment } from '@/types/assignment';
 
 interface AssignmentCardProps {
   id: number;
@@ -17,6 +16,7 @@ interface AssignmentCardProps {
   score: number;
   submitted_number: number;
   onClick: (id: number) => void;
+  create_by_fullname: string;
 }
 
 export default function AssignmentCard({
@@ -28,10 +28,10 @@ export default function AssignmentCard({
   submissionDate,
   submitted_number,
   members,
-  score,
   //   status,
   isOwned,
   onClick,
+  create_by_fullname,
 }: AssignmentCardProps) {
   const determineStatus = () => {
     const now = new Date();
@@ -64,7 +64,7 @@ export default function AssignmentCard({
             <div className='flex flex-col'>
               <div className='text-lg font-medium text-gray-800'>{title}</div>
               <div className='text-sm text-gray-500'>
-                <span>Owner: {owner}</span>
+                <span>Owner: {create_by_fullname}</span>
               </div>
             </div>
           </div>
@@ -92,7 +92,7 @@ export default function AssignmentCard({
             <div className='flex flex-col'>
               <div className='text-lg font-medium text-gray-800'>{title}</div>
               <div className='text-sm text-gray-500'>
-                <span>Owner: {owner}</span>
+                <span>Owner: {create_by_fullname}</span>
               </div>
             </div>
           </div>

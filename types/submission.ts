@@ -11,6 +11,10 @@ export interface Submission {
 
   status: string;
 
+  user_full_name: string;
+
+  user_username: string;
+
   files: SubmissionFile[];
 }
 

@@ -101,7 +101,6 @@ export default function AssignmentsPage({ params }: AssignmentPageProps) {
       setFiles((prev) => [...prev, ...selectedFiles]);
     }
 
-    // ตรวจสอบให้แน่ใจว่า images ไม่เป็น undefined และมีค่าที่ต้องการ
     if (!images || images.length === 0) {
       console.log('No images selected.');
       return; // หยุดการทำงานหากไม่มีไฟล์
@@ -165,6 +164,7 @@ export default function AssignmentsPage({ params }: AssignmentPageProps) {
                   submitted_number={assignment.submitted_number}
                   isOwned={showOwned}
                   onClick={() => handleTaskClick(assignment)}
+                  create_by_fullname={assignment.created_by_full_name}
                 />
               ))}
             </div>

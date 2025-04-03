@@ -139,7 +139,7 @@ export default function AssignmentsubmissionDetailPage({
                   <div className='mr-3 h-13 w-13 rounded-full bg-gray-300'></div>
                   <div className='flex flex-col'>
                     <div className='text-lg font-medium text-gray-800'>
-                      {assignment?.created_by}
+                      {submission?.user_full_name}
                     </div>
                     <div className='text-sm font-medium text-gray-800'>
                       {assignment?.title}
